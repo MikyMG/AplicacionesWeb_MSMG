@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citas</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="Tarjetas.css">
+  <link rel="stylesheet" href="Botones.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <header>Gestión de Citas Médicas</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+    <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+  <form id="formCitas">
+      <!-- Nombre del paciente -->
+      <label for="paciente">Nombre del Paciente</label>
+      <select id="paciente" name="paciente">
+        <option value="">Seleccione un paciente</option>
+      </select>
+
+  <!-- Identificación del paciente -->
+  <label for="cedula">Cédula del Paciente</label>
+  <input type="text" id="cedula" placeholder="Número de cédula" readonly>
+
+      <!-- Asignación de médicos -->
+      <label for="medico">Seleccione Médico y Especialidad</label>
+    <select id="medico" name="medico">
+          <option value="">Seleccione un médico</option>
+      </select>
+
+      <!-- Fecha y hora de la cita -->
+      <label for="fecha">Fecha y Hora de la Cita</label>
+      <input type="datetime-local" id="fecha">
+
+      <!-- Asignación de consultorio -->
+      <label for="consultorio">Consultorio Asignado</label>
+      <input type="text" id="consultorio" placeholder="Ejemplo: Consultorio 3, Planta Alta">
+ 
+      <!-- Estados de las citas -->
+      <label for="estado">Estado de la Cita</label>
+      <select id="estado">
+        <option value="">Seleccione estado</option>
+        <option>Pendiente</option>
+        <option>Atendida</option>
+        <option>Cancelada</option>
+        <option>Reprogramada</option>
+      </select>
+      
+      <!-- Observaciones adicionales -->
+      <label for="observaciones">Observaciones</label>
+      <textarea id="observaciones" placeholder="Notas adicionales sobre la cita o el paciente..."></textarea>
+      
+      <!-- Botones del sistema -->
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="reset">Cancelar</button>
+      </div>
+    </form>
+
+    <!-- Lista de citas -->
+    <div id="lista-citas" class="lista-cards">
+      <!-- Aquí se mostrarán las tarjetas de citas -->
+    </div>
+  </div>
+  
+</body>
+</html>

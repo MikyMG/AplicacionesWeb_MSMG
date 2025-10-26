@@ -1,0 +1,97 @@
+/* Colores base */
+:root {
+  --rojo: #c10e1a;
+  --rojo-oscuro: #9e0f18;
+  --gris: #666666;
+  --gris-claro: #f1f1f1;
+  --blanco: #ffffff;
+}
+
+/* Base general */
+body {
+  background: #f4f6f9;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Contenedor */
+.login-container {
+  max-width: 650px;
+  width: 100%;
+  background: var(--blanco);
+  padding: 35px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.logo-uleam {
+  width: 200px;
+  margin-bottom: 15px;
+}
+
+/* Título */
+h2 {
+  color: var(--rojo);
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* Campos */
+.input-group {
+  margin-bottom: 18px;
+}
+input, select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: var(--gris-claro);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+input:focus, select:focus {
+  border-color: var(--rojo);
+  box-shadow: 0 0 5px rgba(193,14,26,0.3);
+  background: #fff;
+}
+
+/* Botones */
+button {
+  width: 100%;
+  background: var(--rojo);
+  color: var(--blanco);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 8px;
+  transition: background 0.3s ease;
+}
+button:hover {
+  background: var(--rojo-oscuro);
+}
+
+/* Enlaces */
+.links {
+  margin-top: 18px;
+}
+a {
+  display: block;
+  color: var(--gris);
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 6px;
+}
+a:hover {
+  text-decoration: underline;
+}

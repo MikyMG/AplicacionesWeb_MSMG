@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especialidades</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="Tarjetas.css">
+  <link rel="stylesheet" href="Botones.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <header>Gestión de Especialidades Médicas</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+    <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+  <form id="formEspecialidad">
+      <!-- Información de especialidades -->
+      <h2 class="seccion-titulo">Datos de la Especialidad</h2>
+      
+      <!-- Nombre de la especialidad -->
+      <div class="campo">
+        <label for="especialidad">Nombre de la Especialidad</label>
+        <select id="especialidad" name="especialidad" required>
+          <option value="">Seleccione una especialidad médica</option>
+          <option>Medicina General</option>
+          <option>Pediatría</option>
+          <option>Ginecología</option>
+          <option>Cardiología</option>
+          <option>Dermatología</option>
+          <option>Neurología</option>
+          <option>Oftalmología</option>
+          <option>Traumatología</option>
+          <option>Odontología</option>
+          <option>Psicología</option>
+        </select>
+      </div>
+
+      <!-- Descripción de la especialidad -->
+      <div class="campo">
+        <label for="descripcion">Descripción de la Especialidad</label>
+        <textarea id="descripcion" name="descripcion" placeholder="Describa brevemente en qué consiste la especialidad médica" required></textarea>
+      </div>
+
+      <!-- Adicionales -->
+      <h2 class="seccion-titulo">Datos Complementarios</h2>
+      
+      <!-- Area de atención -->
+      <div class="campo">
+        <label for="area">Área o Departamento</label>
+        <input type="text" id="area" name="area" placeholder="Ejemplo: Consultorio 2 - Edificio Principal" required>
+      </div>
+
+      <!-- Horario de atención -->
+      <div class="campo">
+        <label for="horario">Horario de Atención</label>
+        <input type="text" id="horario" name="horario" placeholder="Ejemplo: Lunes a Viernes, 08h00 - 16h00" required>
+      </div>
+
+      <!-- Médico responsable de la especialidad -->
+      <div class="campo">
+        <label for="responsable">Médico Responsable</label>
+        <input type="text" id="responsable" name="responsable" placeholder="Nombre del médico encargado del área" required>
+      </div>
+
+      <!-- Botones del sistema -->
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="button">Eliminar</button>
+      </div>
+    </form>
+
+    <!-- Lista de especialidades -->
+    <div id="lista-especialidades" class="lista-cards">
+      <!-- Aquí se mostrarán las tarjetas de especialidades -->
+    </div>
+  </div>
+</body>
+</html>

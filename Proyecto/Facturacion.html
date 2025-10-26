@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturación</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <header>Gestión de Facturación</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+    <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+    <form id="formFacturacion">
+
+      <!-- Datos del paciente -->
+      <h2 class="seccion-titulo">Datos del Paciente</h2>
+        <div class="campo">
+        <label for="paciente">Nombre del Paciente</label>
+        <select id="paciente" name="paciente">
+          <option value="">Seleccione un paciente</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="cedula">Cédula / Identificación</label>
+        <input type="text" id="cedula" name="cedula" placeholder="Número de identificación del paciente">
+      </div>
+
+      <!-- Datos de los servivios ofrecidos -->
+      <h2 class="seccion-titulo">Detalles del Servicio</h2>
+      <div class="campo">
+        <label for="medico">Médico Responsable</label>
+  <select id="medico" name="medico">
+          <option value="">Seleccione un médico</option>
+          <option>Dr. José Zambrano - Medicina General</option>
+          <option>Dra. María Ponce - Pediatría</option>
+          <option>Dr. Luis Moreira - Cardiología</option>
+          <option>Dra. Ana García - Ginecología</option>
+          <option>Dra. Elisa Espinoza - Dermatología</option>
+          <option>Dr. Carlos Freire - Odontología</option>
+          <option>Dr. Derek Cedeño - Psicología</option>
+        </select>
+
+      </div>
+
+      <!-- Tipo de servicio o tratamiento -->
+      <div class="campo">
+        <label for="servicio">Servicio o Tratamiento</label>
+  <select id="servicio" name="servicio">
+          <option value="">Seleccione el tipo de servicio</option>
+          <option>Consulta Médica General</option>
+          <option>Consulta Especializada</option>
+          <option>Laboratorio Clínico</option>
+          <option>Ecografía</option>
+          <option>Examen de Rayos X</option>
+          <option>Control Post-Consulta</option>
+        </select>
+      </div>
+      
+      <!-- Descripción del servicio -->
+      <div class="campo">
+        <label for="descripcion">Descripción / Detalle del Servicio</label>
+        <textarea id="descripcion" name="descripcion" placeholder="Escriba detalles del servicio o tratamiento brindado"></textarea>
+      </div>
+
+      <!-- Costo del servicio -->
+      <div class="campo">
+        <label for="costo">Costo del Servicio ($)</label>
+  <input type="number" id="costo" name="costo" placeholder="Ingrese el costo total" step="0.01" min="0">
+      </div>
+
+      <!-- Datos de pago -->
+      <div class="campo">
+        <label for="metodoPago">Método de Pago</label>
+  <select id="metodoPago" name="metodoPago">
+          <option value="">Seleccione el método de pago</option>
+          <option>Efectivo</option>
+          <option>Tarjeta de Crédito</option>
+          <option>Tarjeta de Débito</option>
+          <option>Transferencia Bancaria</option>
+        </select>
+      </div>
+      <!-- Fecha de emisión -->
+      <div class="campo">
+        <label for="fecha">Fecha de Emisión</label>
+  <input type="date" id="fecha" name="fecha">
+      </div>
+
+      <!-- Botones del sistema -->
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="button">Eliminar</button>
+        <button type="button" id="btnDescargarFactura" onclick="(function(){ if(window.lastSavedFacturaId){ generarPDF('facturas', window.lastSavedFacturaId); } else { if(typeof mostrarMensaje==='function') mostrarMensaje('No hay factura disponible para descargar', 'error'); } })()">Descargar PDF</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

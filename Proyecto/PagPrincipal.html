@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+    <link rel="stylesheet" href="PagPrincipal.css">
+  <script src="Validaciones.js" defer></script> 
+  <!-- Librería Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Librería jsPDF para generar PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <header class="encabezado">
+    <div class="encabezado-contenido">
+      <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam" />
+      <div class="texto-uleam">
+        <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+        <p class="subtitulo">Sistema de Consultas Médicas</p>
+        <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor -->
+  <div class="main-container">
+
+    <!-- Panel de navegación -->
+    <aside class="sidebar">
+      <h2>Menú Principal</h2>
+      <nav>
+        <ul>
+          <li><a href="Pacientes.html">Pacientes</a></li>
+          <li><a href="Citas.html">Citas Médicas</a></li>
+          <li><a href="Historial.html">Historia Clínica</a></li>
+          <li><a href="Medicos.html">Médicos</a></li>
+          <li><a href="Especialidades.html">Especialidades Médicas</a></li>
+          <li><a href="Facturacion.html">Facturación</a></li>
+          <li><a href="Reportes.html">Reportes</a></li>
+          <li><a href="Inicio.html" onclick="return confirmarCerrarSesion(event, this.href)">Cerrar Sesión</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- ===== Contenido principal ===== -->
+    <main class="content">
+      <h1>Bienvenido al Panel de Control</h1>
+
+      <!-- Cuadros de resumen -->
+      <div class="cards" role="list" aria-label="Resumen rápido">
+        <div class="card" role="listitem">
+          <h3 id="total-pacientes">0</h3>
+          <p>Pacientes</p>
+        </div>
+
+        <div class="card" role="listitem">
+          <h3 id="total-medicos">0</h3>
+          <p>Médicos</p>
+        </div>
+
+        <div class="card" role="listitem">
+          <h3 id="total-citas">0</h3>
+          <p>Citas</p>
+        </div>
+
+        <div class="card" role="listitem">
+          <h3 id="total-especialidades">0</h3>
+          <p>Especialidades</p>
+        </div>
+      </div>
+
+      <!-- Sección de gráficos -->
+      <section class="charts">
+        <div class="chart-box">
+          <h3>Citas por Semana</h3>
+          <canvas id="barChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+          <h3>Distribución de Especialidades</h3>
+          <canvas id="especialidadesChart"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+  <!-- Gráficos Script -->
+  <script src="Graficos.js"></script>
+</body>
+</html>

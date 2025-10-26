@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Médicos</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="Tarjetas.css">
+    <link rel="stylesheet" href="Botones.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <header>Gestión de Médicos</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+    <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+  <form id="formMedicos">
+      <!-- Datos del médico -->
+      <label for="nombre">Nombres y Apellidos</label>
+      <input type="text" id="nombre" name="nombre">
+
+      <label for="especialidad">Especialidad</label>
+      <input type="text" id="especialidad" name="especialidad">
+
+      <label for="telefono">Teléfono</label>
+      <input type="text" id="telefono" name="telefono">
+
+      <label for="correo">Correo Electrónico</label>
+      <input type="email" id="correo" name="correo">
+
+      <label>Horario de Atención (recurrente)</label>
+      <div id="horarioRecurrente" style="border:1px dashed #e5e5e5;padding:12px;border-radius:8px;margin-bottom:12px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <label><input type="checkbox" name="dias" value="lun"> Lun</label>
+          <label><input type="checkbox" name="dias" value="mar"> Mar</label>
+          <label><input type="checkbox" name="dias" value="mie"> Mié</label>
+          <label><input type="checkbox" name="dias" value="jue"> Jue</label>
+          <label><input type="checkbox" name="dias" value="vie"> Vie</label>
+          <label><input type="checkbox" name="dias" value="sab"> Sáb</label>
+          <label><input type="checkbox" name="dias" value="dom"> Dom</label>
+        </div>
+
+        <div id="franjasPorDia" style="display:flex;flex-direction:column;gap:10px">
+          <!-- Aquí se insertarán las franjas por día -->
+        </div>
+      <!-- Botones del sistema-->
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="button">Eliminar</button>
+      </div>
+    </form>
+
+    <!-- Lista de médicos -->
+    <div id="lista-medicos" class="lista-datos">
+      <!-- Aquí se mostrarán las tarjetas de médicos -->
+    </div>
+  </div>

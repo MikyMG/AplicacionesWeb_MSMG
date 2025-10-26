@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <header>Gestión de Historias Clínicas</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+  <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+  <form id="formHistorial">
+
+      <!-- Datos generales del paciente -->
+      <h2>Datos Generales</h2>
+      <label for="hist_paciente">Paciente</label>
+      <select id="hist_paciente">
+        <option value="">Seleccione paciente</option>
+      </select>
+
+  <label for="hist_fechaConsulta">Ultima fecha de consulta</label>
+  <input id="hist_fechaConsulta" type="date">
+
+  <label for="hist_medico">Médico Responsable</label>
+  <input id="hist_medico" type="text">
+
+  <label for="hist_especialidad">Especialidad</label>
+  <input id="hist_especialidad" type="text">
+
+  <label for="hist_motivo">Motivo de Consulta</label>
+  <textarea id="hist_motivo" rows="2"></textarea>
+
+      <!-- Datos de los antecendentes médicos -->
+      <h2>Antecedentes Médicos</h2>
+      <label>Antecedentes Personales</label>
+      <textarea rows="3" placeholder="Enfermedades previas, alergias, operaciones, etc."></textarea>
+
+      <label>Antecedentes Familiares</label>
+      <textarea rows="3" placeholder="Patologías hereditarias, enfermedades familiares..."></textarea>
+
+      <label>Hábitos</label>
+      <textarea rows="2" placeholder="Ejemplo: consumo de alcohol, tabaco, actividad física..."></textarea>
+
+      <!-- Datos de exploración física y signos vitales  -->
+      <h2>Exploración Física y Signos Vitales</h2>
+
+  <label for="peso">Peso (kg)</label>
+  <input id="peso" type="number" step="0.1">
+
+  <label for="estatura">Estatura (m)</label>
+  <input id="estatura" type="number" step="0.01">
+
+  <label for="presion">Presión Arterial (mmHg)</label>
+  <input id="presion" type="text" placeholder="Ejemplo: 120/80">
+
+  <label for="fc">Frecuencia Cardíaca (lpm)</label>
+  <input id="fc" type="number">
+
+  <label for="fr">Frecuencia Respiratoria (rpm)</label>
+  <input id="fr" type="number">
+
+  <label for="temp">Temperatura Corporal (°C)</label>
+  <input id="temp" type="number" step="0.1">
+
+  <label for="sat">Saturación de Oxígeno (%)</label>
+  <input id="sat" type="number" step="0.1">
+
+  <label for="imc">Índice de Masa Corporal (IMC)</label>
+  <input id="imc" type="text">
+
+      <label>Observaciones de Examen Físico</label>
+      <textarea rows="3" placeholder="Descripción general del estado del paciente..."></textarea>
+
+      <!-- Formulario de diagnñosticos y tratamientos -->
+      <h2>Diagnóstico y Tratamiento</h2>
+      <label>Diagnóstico Principal</label>
+      <textarea rows="2"></textarea>
+
+      <label>Diagnóstico Secundario</label>
+      <textarea rows="2"></textarea>
+
+      <label>Tratamiento Indicado</label>
+      <textarea rows="3" placeholder="Medicamentos, dosis, frecuencia, duración..."></textarea>
+
+      <label>Recomendaciones Médicas</label>
+      <textarea rows="2" placeholder="Cuidados, reposo, controles, alimentación, etc..."></textarea>
+
+      <label>Exámenes Solicitados</label>
+      <textarea rows="2" placeholder="Laboratorio, otros..."></textarea>
+
+  <label for="proxima_cita">Próxima Cita / Control</label>
+  <input id="proxima_cita" type="date">
+
+  <label for="observaciones_ad">Observaciones Adicionales</label>
+  <textarea id="observaciones_ad" rows="3"></textarea>
+
+      <!-- Botones del sistema -->
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="reset">Limpiar</button>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>

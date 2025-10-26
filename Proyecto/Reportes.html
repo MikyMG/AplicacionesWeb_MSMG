@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <!-- Encabezado -->
+  <div class="encabezado-contenido">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+    <div class="texto-uleam">
+      <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
+      <p class="subtitulo">Sistema de Consultas Médicas</p>
+      <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    </div>
+  </div>
+
+  <!-- Título debajo del encabezado -->
+  <header>Reportes</header>
+
+  <!-- Contenedor -->
+  <div class="container">
+  <div class="boton-retorno"><a href="PagPrincipal.html" class="btn-retorno" aria-label="Volver al inicio" title="Volver"><i class="fas fa-arrow-left"></i></a></div>
+  <form id="formReportes">
+      
+      <label for="paciente">Buscar por paciente</label>
+      <select id="paciente" name="paciente">
+        <option value="">Seleccione un paciente</option>
+      </select>
+
+      <div class="fechas">
+        <div>
+          <label for="fechaInicio">Desde</label>
+          <input type="date" id="fechaInicio" name="fechaInicio">
+        </div>
+        <div>
+          <label for="fechaFin">Hasta</label>
+          <input type="date" id="fechaFin" name="fechaFin">
+        </div>
+      </div>
+
+      <div class="botones">
+        <button type="submit">Filtrar</button>
+        <button type="reset">Limpiar</button>
+      </div>
+    </form>
+
+      <!-- Contenedor donde se mostrará el cuadro/tarjetas de resultados -->
+      <div id="lista-reportes" class="lista-cards">
+        <!-- Renderizado dinámico de resultados -->
+      </div>
+  </div>
+</body>
+</html>

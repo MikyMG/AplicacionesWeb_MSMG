@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="General.css">
+    <link rel="stylesheet" href="Inicio.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="Validaciones.js" defer></script>
+</head>
+<body>
+  <div class="login-container">
+    <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam">
+
+  <form id="formLogin">
+      <h2>Iniciar Sesión</h2>
+
+      <!-- Selección de rol -->
+      <div class="input-group">
+  <select name="rol" id="rol" required>
+          <option value="">Seleccione su rol</option>
+          <option value="admin">Administrador</option>
+          <option value="medico">Médico</option>
+          <option value="enfermera">Enfermera</option>
+        </select>
+      </div>
+
+      <!-- Campo usuario -->
+      <div class="input-group">
+  <input type="text" id="usuario" name="usuario" placeholder="Usuario o Correo Electrónico">
+      </div>
+
+      <!-- Campo contraseña -->
+      <div class="input-group">
+  <input type="password" id="contrasena" name="contrasena" placeholder="Contraseña">
+      </div>
+
+      <!-- Botón de ingreso -->
+      <button type="submit">Ingresar</button>
+
+      <!-- Enlaces inferiores -->
+      <div class="links">
+        <a href="#" id="olvidoContrasena" onclick="validarOlvidoContrasena(event)">¿Olvidó su contraseña?</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
