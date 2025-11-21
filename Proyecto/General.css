@@ -1,4 +1,8 @@
+/* =============================== */
+/* SECCIÓN 1: Listas y tarjetas de datos */
+/* =============================== */
 /* Cuadros para reportes y datos (estilo pacientes) */
+/* Contenedor principal de listas de datos */
 .lista-datos {
   width: 100%;
   margin: 2rem auto;
@@ -8,6 +12,7 @@
   box-shadow: var(--sombra-md);
 }
 
+/* Título de la lista de datos */
 .lista-datos h3 {
   color: var(--primario);
   margin-bottom: 1.5rem;
@@ -17,6 +22,7 @@
   padding-bottom: 0.5rem;
 }
 
+/* Grid para tarjetas de datos */
 .datos-grid {
   display: flex;
   flex-direction: column;
@@ -24,8 +30,7 @@
   width: 100%;
 }
 
-
-
+/* Tarjeta individual de datos */
 .dato-card {
   display: flex;
   flex-direction: row;
@@ -44,12 +49,14 @@
   max-width: 100%;
 }
 
+/* Efecto hover en tarjeta de datos */
 .dato-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--sombra-md);
   border-color: var(--primario-claro);
 }
 
+/* Contenedor de información dentro de la tarjeta */
 .dato-info {
   display: flex;
   flex-direction: row;
@@ -58,6 +65,7 @@
   flex: 1;
 }
 
+/* Título dentro de la tarjeta de datos */
 .dato-info h4 {
   color: var(--primario);
   font-size: 1.1rem;
@@ -66,6 +74,7 @@
 }
 
 
+/* Texto de campos dentro de la tarjeta */
 .dato-info p {
   margin: 0;
   color: var(--gris);
@@ -77,11 +86,13 @@
   max-width: 250px;
 }
 
+/* Etiqueta de campo resaltada */
 .dato-info p strong {
   color: var(--primario);
   margin-right: 0.5rem;
 }
 
+/* Contenedor de botones de acción en la tarjeta */
 .dato-acciones {
   display: flex;
   gap: 0.5rem;
@@ -91,6 +102,7 @@
   align-items: center;
 }
 
+/* Botones de acción (PDF, editar, eliminar) */
 .dato-acciones button {
   min-width: 100px;
   padding: 0.6rem 1.2rem;
@@ -110,17 +122,19 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+/* Efecto hover en botones de acción */
 .dato-acciones button:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0,0,0,0.15);
 }
 
+/* Efecto active en botones de acción */
 .dato-acciones button:active {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Colores específicos para cada tipo de botón */
+/* Colores específicos para cada tipo de botón de acción */
 .btn-pdf {
   background-color: var(--primario);
 }
@@ -163,6 +177,9 @@
   transform: translateY(-1px);
 }
 /* Paleta de colores y sombras */
+/* =============================== */
+/* SECCIÓN 2: Variables CSS globales y colores */
+/* =============================== */
 :root {
   --primario: #c10e1a;
   --primario-oscuro: #9e0f18;
@@ -178,6 +195,9 @@
   --sombra-lg: 0 8px 30px rgba(0,0,0,0.15);
   --transicion: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* =============================== */
+/* SECCIÓN 3: Reset y estilos base */
+/* =============================== */
 /* Base General */
 * {
   margin: 0;
@@ -185,11 +205,13 @@
   box-sizing: border-box;
 }
 
+/* Comportamiento de scroll y altura */
 html {
   scroll-behavior: smooth;
   height: 100%;
 }
 
+/* Estilos generales del body */
 body {
   font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
@@ -202,7 +224,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* =============================== */
+/* SECCIÓN 4: Encabezado institucional y logo */
+/* =============================== */
 /* Encabezado Uleam */
+/* Contenedor del encabezado y logo */
 .encabezado-contenido {
   display: flex;
   align-items: center;
@@ -231,6 +257,7 @@ body {
   50% { background-position: 100% 50%; }
 }
 
+/* Logo institucional */
 .logo-uleam {
   width: 150px;
   height: auto;
@@ -244,11 +271,13 @@ body {
   filter: drop-shadow(0 4px 12px rgba(193, 14, 26, 0.3));
 }
 
+/* Contenedor de textos institucionales */
 .texto-uleam {
   flex: 1;
   text-align: left;
 }
 
+/* Título principal institucional */
 .texto-uleam h1 {
   font-size: 22px;
   font-weight: 700;
@@ -258,6 +287,7 @@ body {
   line-height: 1.3;
 }
 
+/* Subtítulo institucional */
 .subtitulo {
   font-size: 15px;
   font-weight: 500;
@@ -265,6 +295,7 @@ body {
   margin: 3px 0;
 }
 
+/* Nombre del policlínico */
 .policlinico {
   font-size: 16px;
   font-weight: 700;
@@ -274,6 +305,9 @@ body {
 }
 
 /* Título de la página */
+/* =============================== */
+/* SECCIÓN 5: Header principal de la página */
+/* =============================== */
 header {
   background: linear-gradient(135deg, var(--primario) 0%, var(--primario-oscuro) 100%);
   color: var(--blanco);
@@ -312,6 +346,9 @@ header::before {
 }
 
 /* Contenerdor */
+/* =============================== */
+/* SECCIÓN 6: Contenedor principal de páginas */
+/* =============================== */
 .container {
   width: 95%;
   max-width: 1100px;
@@ -328,6 +365,9 @@ header::before {
   border-top: none;
 }
 
+/* =============================== */
+/* SECCIÓN 7: Botón de retorno */
+/* =============================== */
 /* Botón de retorno - estilo moderno y reutilizable */
 .boton-retorno {
   display: flex;
@@ -379,6 +419,9 @@ header::before {
   }
 }
 
+/* =============================== */
+/* SECCIÓN 8: Formularios y campos */
+/* =============================== */
 /* Formulario flotante */
 form {
   display: flex;
@@ -421,6 +464,9 @@ form {
 }
 .data-card p { margin: 0; padding: 6px 0; }
 
+/* =============================== */
+/* SECCIÓN 9: Modal reutilizable para edición y confirmaciones */
+/* =============================== */
 /* Modal reutilizable para edición y confirmaciones */
 .modal-overlay {
   position: fixed;
@@ -584,6 +630,9 @@ select:focus {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c10e1a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 
+/* =============================== */
+/* SECCIÓN 10: Botones y estilos de interacción */
+/* =============================== */
 /* Botones con hover difuminado */
 button,
 .btn {
@@ -665,6 +714,9 @@ button[type="button"],
   color: var(--gris-oscuro);
 }
 
+/* =============================== */
+/* SECCIÓN 11: Mensajes de validación (toast) */
+/* =============================== */
 /* Mensajes de validación (toast) - cuadro llamativo y accesible */
 .mensaje-validacion {
   position: fixed;
@@ -749,6 +801,9 @@ button[type="button"]:hover,
   min-width: 140px;
 }
 
+/* =============================== */
+/* SECCIÓN 12: Tablas y estilos de filas */
+/* =============================== */
 /* Tablas */
 table {
   width: 100%;
@@ -792,6 +847,9 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
+/* =============================== */
+/* SECCIÓN 13: Tarjetas y cards de resumen */
+/* =============================== */
 /* Tarjetas */
 .card {
   background: var(--blanco);
@@ -832,6 +890,9 @@ tbody tr:last-child td {
   margin: 20px 0;
 }
 
+/* =============================== */
+/* SECCIÓN 14: Insignias y badges */
+/* =============================== */
 /* Insigneas */
 .badge {
   display: inline-block;
@@ -862,6 +923,9 @@ tbody tr:last-child td {
   color: var(--blanco);
 }
 
+/* =============================== */
+/* SECCIÓN 15: Cargador (spinner) */
+/* =============================== */
 /* Cargador */
 .spinner {
   border: 4px solid var(--gris-claro);
@@ -878,6 +942,9 @@ tbody tr:last-child td {
   100% { transform: rotate(360deg); }
 }
 
+/* =============================== */
+/* SECCIÓN 16: Utilidades y helpers de clases */
+/* =============================== */
 /* Utilidades */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
@@ -911,6 +978,9 @@ tbody tr:last-child td {
 .rounded-lg { border-radius: 12px; }
 .rounded-full { border-radius: 9999px; }
 
+/* =============================== */
+/* SECCIÓN 17: Barra de desplazamiento personalizada */
+/* =============================== */
 /* Barra de desplazamiento personalizado */
 ::-webkit-scrollbar {
   width: 10px;
@@ -931,6 +1001,9 @@ tbody tr:last-child td {
   background: linear-gradient(135deg, var(--primario-claro) 0%, var(--primario) 100%);
 }
 
+/* =============================== */
+/* SECCIÓN 18: Diseño responsivo (media queries) */
+/* =============================== */
 /* Diseño responsivo */
 @media (max-width: 768px) {
   .encabezado-contenido {
@@ -1014,6 +1087,9 @@ tbody tr:last-child td {
   }
 }
 
+/* =============================== */
+/* SECCIÓN 19: Animaciones adicionales */
+/* =============================== */
 /* Animaciones adicionales */
 @keyframes fadeIn {
   from { opacity: 0; }

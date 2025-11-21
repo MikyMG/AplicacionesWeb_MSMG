@@ -1,3 +1,29 @@
+/* Asegura que los gráficos sean visibles */
+.charts {
+  display: flex;
+  gap: 32px;
+  margin-top: 32px;
+  justify-content: center;
+}
+.chart-box {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 32px 24px 24px 24px;
+  min-width: 350px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.chart-box canvas {
+  min-width: 300px !important;
+  min-height: 260px !important;
+  max-width: 100% !important;
+  max-height: 320px !important;
+  display: block;
+}
 /* Colores base */
 :root {
   --primario: #b70a1a;

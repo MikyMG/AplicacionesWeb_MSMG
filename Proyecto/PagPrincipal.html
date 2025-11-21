@@ -1,92 +1,93 @@
+<!-- Página principal del sistema de gestión médica -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
-    <link rel="stylesheet" href="PagPrincipal.css">
-  <script src="Validaciones.js" defer></script> 
-  <!-- Librería Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Librería jsPDF para generar PDFs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Página Principal</title> <!-- Título de la pestaña -->
+    <link rel="stylesheet" href="PagPrincipal.css"> <!-- Estilos principales -->
+    <!-- Librería Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Gráficos -->
+    <!-- Librería jsPDF para generar PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- PDF -->
+    <script src="Validaciones.js" defer></script> <!-- Lógica JS principal -->
 </head>
 <body>
 
   <!-- Encabezado -->
   <header class="encabezado">
-    <div class="encabezado-contenido">
-      <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam" />
-      <div class="texto-uleam">
-        <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1>
-        <p class="subtitulo">Sistema de Consultas Médicas</p>
-        <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p>
+    <div class="encabezado-contenido"> <!-- Logo y textos -->
+      <img src="LOGO-ULEAM-VERTICAL.png" alt="Logo ULEAM" class="logo-uleam" /> <!-- Logo ULEAM -->
+      <div class="texto-uleam"> <!-- Títulos institucionales -->
+        <h1>UNIVERSIDAD LAICA ELOY ALFARO DE MANABÍ</h1> <!-- Título principal -->
+        <p class="subtitulo">Sistema de Consultas Médicas</p> <!-- Subtítulo -->
+        <p class="policlinico">POLICLÍNICO UNIVERSITARIO</p> <!-- Nombre del policlínico -->
       </div>
     </div>
   </header>
 
-  <!-- Contenedor -->
+  <!-- Contenedor principal de la página -->
   <div class="main-container">
 
     <!-- Panel de navegación -->
     <aside class="sidebar">
-      <h2>Menú Principal</h2>
-      <nav>
+      <h2>Menú Principal</h2> <!-- Título del menú -->
+      <nav> <!-- Opciones de navegación -->
         <ul>
-          <li><a href="Pacientes.html">Pacientes</a></li>
-          <li><a href="Citas.html">Citas Médicas</a></li>
-          <li><a href="Historial.html">Historia Clínica</a></li>
-          <li><a href="Medicos.html">Médicos</a></li>
-          <li><a href="Especialidades.html">Especialidades Médicas</a></li>
-          <li><a href="Facturacion.html">Facturación</a></li>
-          <li><a href="Reportes.html">Reportes</a></li>
-          <li><a href="Inicio.html" onclick="return confirmarCerrarSesion(event, this.href)">Cerrar Sesión</a></li>
+          <li><a href="Pacientes.html">Pacientes</a></li> <!-- Ir a gestión de pacientes -->
+          <li><a href="Citas.html">Citas Médicas</a></li> <!-- Ir a gestión de citas -->
+          <li><a href="Historial.html">Historia Clínica</a></li> <!-- Ir a historial clínico -->
+          <li><a href="Medicos.html">Médicos</a></li> <!-- Ir a gestión de médicos -->
+          <li><a href="Especialidades.html">Especialidades Médicas</a></li> <!-- Ir a especialidades -->
+          <li><a href="Facturacion.html">Facturación</a></li> <!-- Ir a facturación -->
+          <li><a href="Reportes.html">Reportes</a></li> <!-- Ir a reportes -->
+          <li><a href="Inicio.html" onclick="return confirmarCerrarSesion(event, this.href)">Cerrar Sesión</a></li> <!-- Cerrar sesión -->
         </ul>
       </nav>
     </aside>
 
-    <!-- ===== Contenido principal ===== -->
+    <!-- Sección principal de contenido -->
     <main class="content">
-      <h1>Bienvenido al Panel de Control</h1>
+      <h1>Bienvenido al Panel de Control</h1> <!-- Aquí se muestra el saludo dinámico -->
 
       <!-- Cuadros de resumen -->
+      <!-- Cuadros de resumen de datos -->
       <div class="cards" role="list" aria-label="Resumen rápido">
-        <div class="card" role="listitem">
-          <h3 id="total-pacientes">0</h3>
+        <div class="card" role="listitem"> <!-- Total de pacientes -->
+          <h3 id="total-pacientes">0</h3> <!-- Se actualiza dinámicamente -->
           <p>Pacientes</p>
         </div>
 
-        <div class="card" role="listitem">
-          <h3 id="total-medicos">0</h3>
+        <div class="card" role="listitem"> <!-- Total de médicos -->
+          <h3 id="total-medicos">0</h3> <!-- Se actualiza dinámicamente -->
           <p>Médicos</p>
         </div>
 
-        <div class="card" role="listitem">
-          <h3 id="total-citas">0</h3>
+        <div class="card" role="listitem"> <!-- Total de citas -->
+          <h3 id="total-citas">0</h3> <!-- Se actualiza dinámicamente -->
           <p>Citas</p>
         </div>
 
-        <div class="card" role="listitem">
-          <h3 id="total-especialidades">0</h3>
+        <div class="card" role="listitem"> <!-- Total de especialidades -->
+          <h3 id="total-especialidades">0</h3> <!-- Se actualiza dinámicamente -->
           <p>Especialidades</p>
         </div>
       </div>
 
       <!-- Sección de gráficos -->
+      <!-- Sección de gráficos estadísticos -->
       <section class="charts">
-        <div class="chart-box">
+        <div class="chart-box"> <!-- Gráfico de barras de citas -->
           <h3>Citas por Semana</h3>
-          <canvas id="barChart"></canvas>
+          <canvas id="barChart"></canvas> <!-- Aquí se dibuja el gráfico de barras -->
         </div>
 
-        <div class="chart-box">
+        <div class="chart-box"> <!-- Gráfico de torta de especialidades -->
           <h3>Distribución de Especialidades</h3>
-          <canvas id="especialidadesChart"></canvas>
+          <canvas id="especialidadesChart"></canvas> <!-- Aquí se dibuja el gráfico de torta -->
         </div>
       </section>
     </main>
-  </div>
-  <!-- Gráficos Script -->
-  <script src="Graficos.js"></script>
+  </div> <!-- Fin main-container -->
 </body>
 </html>

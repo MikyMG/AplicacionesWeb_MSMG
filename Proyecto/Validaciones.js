@@ -1,5 +1,9 @@
 // Parte 1. Variables de almacenamiento y configuración
 // Esta parte funciona como una base de datos en localstore, aunque no es una base de datos como tal pero cumple con la de guardar datos
+// ===============================
+// SECCIÓN 1: Variables de almacenamiento y configuración
+// ===============================
+// Esta parte funciona como una "base de datos" local usando localStorage y define la configuración global del sistema y de los PDFs.
 const baseDatos = {
     pacientes: [],
     citas: [],
@@ -7,7 +11,8 @@ const baseDatos = {
     especialidades: [],
     facturas: []
 };
-// Configuración para PDFs y reportes
+// Configuración para PDFs
+// Configuración para PDFs (colores, márgenes, fuentes)
 const PDF_CONFIG = {
     pageSize: 'a4', 
     margin: {
@@ -17,7 +22,7 @@ const PDF_CONFIG = {
         left: 20 // espacio izquierdo
     },
     colors: {
-        primary: [180, 0, 0],
+        primary: [180, 0, 0], 
         secondary: [128, 0, 0]
     },
     fonts: { 
@@ -28,30 +33,36 @@ const PDF_CONFIG = {
     }
 };
 // Variables para el sistema de reportes
+// Variables globales para el sistema de reportes y facturación
 let lastReportResults = []; 
 let lastReportType = ''; 
 let lastSavedFacturaId = null; 
 // Asegurar que las funciones de PDF estén disponibles globalmente
+// Asegura que las funciones de PDF estén disponibles globalmente
 if (typeof window !== 'undefined') { 
     window.PDF_CONFIG = PDF_CONFIG;
 }
 
 // Parte 2. Validaciones reutilizables que compruebas datos comunes
 // Objeto de validaciones
+// ===============================
+// SECCIÓN 2: Validaciones reutilizables y helpers
+// ===============================
+// Funciones y expresiones regulares para validar campos comunes (vacío, longitud, solo letras, email, etc.)
 const validaciones = { 
     validarCampoVacio(valor, nombreCampo) { 
         if (!valor || valor.trim() === '') { 
             mostrarMensaje(`El campo "${nombreCampo}" es obligatorio`, 'error');
             return false;
         }
-        return true; // Si tiene contenido devuelve verdadero
+        return true; 
     },
-    validarLongitudMinima(valor, minimo, nombreCampo) { // Verifica los caracteres minimos
+    validarLongitudMinima(valor, minimo, nombreCampo) {
         if (valor.length < minimo) {
             mostrarMensaje(`${nombreCampo} debe tener al menos ${minimo} caracteres`, 'error');
             return false;
         }
-        return true; // Si cumple la longitud devuelve verdadero
+        return true;
     },
     validarSoloLetras(valor, nombreCampo) {
         const regex = /^[A-Za-záéíóúÁÉÍÓÚñÑ]+(\s+[A-Za-záéíóúÁÉÍÓÚñÑ]+)*$/;
@@ -70,11 +81,16 @@ const validaciones = {
         return true;
     }
 };
-// Exportar funciones de validación, hace que sean accesibles globalmente sin escribir validaciones
+// Exportar funciones de validación
+// Exporta funciones de validación para uso global
 const { validarCampoVacio, validarLongitudMinima, validarSoloLetras, validarEmail } = validaciones;
 
 // Parte 3. Guardamos y cargamos datos
-// Funciones de persistencia, esto asegura que no se borren los datos al recargar la página 
+// Funciones de persistencia
+// ===============================
+// SECCIÓN 3: Persistencia de datos (guardar y cargar)
+// ===============================
+// Funciones para guardar y cargar datos en localStorage
 function guardarDatos() {
     try {
         localStorage.setItem('policlinico_datos', JSON.stringify(baseDatos));
@@ -99,9 +115,9 @@ function cargarDatos() {
             sanitizeEspecialidades();
             
             setTimeout(() => {
-                cargarOpcionesPacientes(); // llena los selectores de pacientes
-                cargarOpcionesMedicos(); // llena los selectores de médicos
-                actualizarTodoTrasCarga(); // actualiza las listas y vistas
+                cargarOpcionesPacientes();
+                cargarOpcionesMedicos();
+                actualizarTodoTrasCarga();
             }, 0);
         }
     } catch (e) {
@@ -109,7 +125,11 @@ function cargarDatos() {
     }
 }
 // Parte 4. Limpieza de datos y helpers de seguridad
-// Inicialización y limpieza de datos para evitar duplicados en especialidades
+// Inicialización y limpieza de datos
+// ===============================
+// SECCIÓN 4: Limpieza de datos y helpers de seguridad
+// ===============================
+// Funciones para limpiar, sanitizar y mostrar mensajes en la UI
 function sanitizeEspecialidades() {
     if (!Array.isArray(baseDatos.especialidades)) {
         baseDatos.especialidades = [];
@@ -129,7 +149,7 @@ function sanitizeEspecialidades() {
     baseDatos.especialidades = cleaned;
 }
 
-// Muestra notificaciones temporales (éxito, error, info) en pantalla
+// 
 // Función para mostrar mensajes al usuario
 function mostrarMensaje(mensaje, tipo = 'error') {
     const mensajeAnterior = document.querySelector('.mensaje-validacion');
@@ -150,7 +170,8 @@ function mostrarMensaje(mensaje, tipo = 'error') {
     }, 3000);
 }
 
-// Horarios recurrentes, se covierten a texto legible
+// Horarios recurrentes (UI helpers)
+// Helpers para manejo de horarios recurrentes (formato, validación, UI)
 function formatHorario(horario) {
     if (!horario) return '-';
     const diasMap = { lun: 'Lun', mar: 'Mar', mie: 'Mié', jue: 'Jue', vie: 'Vie', sab: 'Sáb', dom: 'Dom' };
@@ -164,7 +185,7 @@ function formatHorario(horario) {
     return parts.join('; ');
 }
 
-// Maneja dos formatos de horarios (nuevo y viejo) y los convierte a texto legible
+// Formatea el objeto de horario en la estructura { recurrente: dias, franjas (desde,hasta), excepciones }
 function formatHorarioRecurrente(schedule) {
     if (!schedule) return 'No especificado';
     // Si vienen en formato {recurrente: [...]}
@@ -252,15 +273,20 @@ function collectHorarioFromDOM() {
     return result;
 }
 
+
 // Función auxiliar para escapar HTML
-// Convierte caracteres especiales para evitar ataques XSS 
+// Función auxiliar para escapar HTML y evitar XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
+
 // Funciones de carga de opciones
-// Llena todos los menús desplegables de pacientes con los nombres actualizados
+// ===============================
+// SECCIÓN 5: Helpers de carga dinámica de opciones en formularios
+// ===============================
+// Carga selectores de pacientes y médicos dinámicamente
 function cargarOpcionesPacientes() {
     const pacienteSelects = document.querySelectorAll('select#paciente, select[name="paciente"]');
     pacienteSelects.forEach(select => {
@@ -289,9 +315,9 @@ function cargarOpcionesPacientes() {
         }
     });
 }
+
 // Inicializar UI de horario recurrente para médicos
-// Configura la interfaz para que al marcar días (Lunes, Martes...) aparezcan campos para horarios
-// Permite agregar/eliminar franjas horarias dinámicamente
+// Inicializa la UI de horarios recurrentes para médicos
 function initHorarioRecurrente() {
     const container = document.getElementById('horarioRecurrente');
     if (!container) return;
@@ -326,7 +352,7 @@ function initHorarioRecurrente() {
             }
         });
     });
-    // Usa "delegación de eventos" para manejar botones creados dinámicamente
+
     // Delegación para botones agregar/eliminar franjas
     franjasWrapper.addEventListener('click', function(e) {
         const addBtn = e.target.closest('.add-franja');
@@ -344,7 +370,7 @@ function initHorarioRecurrente() {
         }
     });
 }
-// Agrega visualmente una franja horaria (08:00 → 12:00) a un día específico
+
 function addFranjaToDay(day, desde = '', hasta = '') {
     const container = document.querySelector(`.franjas[data-day="${day}"]`);
     if (!container) return;
@@ -362,7 +388,7 @@ function addFranjaToDay(day, desde = '', hasta = '') {
     `;
     container.appendChild(fr);
 }
-// Llena los menús desplegables de médicos, mostrando "Nombre - Especialidad"
+
 function cargarOpcionesMedicos() {
     const medicoSelects = document.querySelectorAll('select#medico, select[name="medico"]');
     medicoSelects.forEach(select => {
@@ -384,53 +410,66 @@ function cargarOpcionesMedicos() {
         });
     });
 }
+
 // Validaciones específicas
+// ===============================
+// SECCIÓN 6: Validaciones específicas de campos y lógica de negocio
+// ===============================
+// Validaciones de cédula, email, teléfono, fechas, edad, IMC, etc.
 function validarCedulaEcuatoriana(cedula) {
     cedula = cedula?.trim() || '';
+    
     if (cedula.length !== 10) {
         mostrarMensaje('La cédula debe tener 10 dígitos', 'error');
         return false;
     }
+    
     if (!/^\d+$/.test(cedula)) {
         mostrarMensaje('La cédula solo debe contener números', 'error');
         return false;
     }
+    
     const provincia = parseInt(cedula.substring(0, 2));
     if (provincia < 1 || provincia > 24) {
         mostrarMensaje('Código de provincia inválido en la cédula', 'error');
         return false;
     }
+    
     const digitoVerificador = parseInt(cedula.charAt(9));
     const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
     let suma = 0;
+    
     for (let i = 0; i < 9; i++) {
         let valor = parseInt(cedula.charAt(i)) * coeficientes[i];
         if (valor >= 10) valor -= 9;
         suma += valor;
-    } 
+    }
+    
     const resultado = suma % 10;
     const digitoEsperado = resultado === 0 ? 0 : 10 - resultado;
+    
     if (digitoVerificador !== digitoEsperado) {
         mostrarMensaje('Número de cédula inválido', 'error');
         return false;
     }
+    
     return true;
 }
-// Verifica que no se registre dos veces la misma cédula.
+
 function cedulaYaExiste(cedula) {
     return baseDatos.pacientes.some(p => p.cedula === cedula);
 }
-// Verifica que no se registre dos veces el mismo correo electrónico
+
 function emailYaExiste(email) {
     if (!email) return false;
     return baseDatos.pacientes.some(p => 
         p.email && p.email.toLowerCase() === email.toLowerCase()
     );
 }
-// Verifica que el número de teléfono celular es válido
+
 function validarTelefono(telefono) {
     telefono = telefono?.trim() || '';
-    // Definimos las validaciones en un array para facilitar la lectura
+    
     const validaciones = [
         {
             condicion: telefono.length === 10,
@@ -445,62 +484,62 @@ function validarTelefono(telefono) {
             mensaje: 'El teléfono solo debe contener números'
         }
     ];
-    // Recorremos las validaciones y mostramos el primer error que encontremos
+
     for (const v of validaciones) {
         if (!v.condicion) {
             mostrarMensaje(v.mensaje, 'error');
             return false;
         }
     }
-    // Si pasa todas las validaciones, devolvemos verdadero
+    
     return true;
 }
-// Valida fechas según el tipo (nacimiento o cita)
+
 function validarFecha(fecha, tipo = 'nacimiento') {
     if (!fecha) {
         mostrarMensaje('Debe seleccionar una fecha', 'error');
         return false;
     }
-    // Determinar si la fecha es válida
+    
     const fechaSeleccionada = new Date(fecha);
     if (isNaN(fechaSeleccionada.getTime())) {
         mostrarMensaje('Formato de fecha inválido', 'error');
         return false;
     }
-    // Obtener la fecha actual para comparaciones
+    
     const fechaActual = new Date();
-    // Validaciones específicas según el tipo de fecha
+    
     switch (tipo) {
         case 'nacimiento':
             if (fechaSeleccionada > fechaActual) {
                 mostrarMensaje('La fecha de nacimiento no puede ser futura', 'error');
                 return false;
             }
-            // Calcular edad 
+            
             const edad = fechaActual.getFullYear() - fechaSeleccionada.getFullYear();
             const mesActual = fechaActual.getMonth();
             const mesNacimiento = fechaSeleccionada.getMonth();
             const diaActual = fechaActual.getDate();
             const diaNacimiento = fechaSeleccionada.getDate();
-            // Ajustar edad si no ha cumplido años este año
+            
             const edadAjustada = edad - (
                 (mesActual < mesNacimiento || 
                  (mesActual === mesNacimiento && diaActual < diaNacimiento)) ? 1 : 0
             );
-            // Verificar rango de edad
+            
             if (edadAjustada > 120) {
                 mostrarMensaje('La edad máxima permitida es 120 años', 'error');
                 return false;
             }
             break;
-        // Validaciones para fechas de citas médicas  
+            
         case 'cita':
             const hoyMismo = new Date(fechaActual.setHours(0, 0, 0, 0));
             if (fechaSeleccionada < hoyMismo) {
                 mostrarMensaje('La fecha de la cita no puede ser en el pasado', 'error');
                 return false;
             }
-            // Verificar que no sea más de 6 meses en el futuro
+            
             const seisMesesDespues = new Date(fechaActual);
             seisMesesDespues.setMonth(seisMesesDespues.getMonth() + 6);
             if (fechaSeleccionada > seisMesesDespues) {
@@ -508,93 +547,103 @@ function validarFecha(fecha, tipo = 'nacimiento') {
                 return false;
             }
             break;
+            
         default:
             console.error(`Tipo de fecha no soportado: ${tipo}`);
             return false;
     }
-    // Si pasa todas las validaciones, devolvemos verdadero
+    
     return true;
 }
-// Calcula la edad en años a partir de la fecha de nacimiento
+
 function calcularEdad(fechaNacimiento) {
     const hoy = new Date();
     const nacimiento = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
     const mes = hoy.getMonth() - nacimiento.getMonth();
-    // Ajustar si no ha cumplido años este año
+    
     if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
         edad--;
     }
+    
     return edad;
 }
-// Calcula el IMC y devuelve la clasificación
+
 function calcularIMC(peso, estatura) {
     if (!peso || !estatura) return '';
-    // Convertir a números
+    
     peso = parseFloat(peso);
     estatura = parseFloat(estatura);
-    // Validar rangos razonables
+    
     if (peso <= 0 || peso > 500) return '';
     if (estatura <= 0 || estatura > 3) return '';
-    // Calcular IMC
+    
     const imc = peso / Math.pow(estatura, 2);
-    // Definir rangos de IMC
+    
     const rangosIMC = [
         { max: 18.5, descripcion: 'Bajo peso' },
         { max: 25, descripcion: 'Normal' },
         { max: 30, descripcion: 'Sobrepeso' },
         { max: Infinity, descripcion: 'Obesidad' }
     ];
-    // Encontrar la clasificación correspondiente
+
     const clasificacion = rangosIMC.find(rango => imc < rango.max)?.descripcion || 'Obesidad';
-    // Devolver resultado
+    
     return `${imc.toFixed(2)} - ${clasificacion}`;
 }
 
 // Validaciones de formularios
-// Valida el formulario de login
+// ===============================
+// SECCIÓN 7: Validaciones de formularios principales del sistema
+// ===============================
+// Incluye validación de login, olvido de contraseña, pacientes, citas, médicos, especialidades, facturación, reportes, historial
+// ===============================
+// SECCIÓN 8: Renderizado de listas y tarjetas de datos
+// ===============================
+// Función reutilizable para mostrar cualquier tipo de lista como tarjetas (cards) con acciones
+// Renderizado de listas específicas: Pacientes, Médicos, Citas, Especialidades, Facturas
 function validarLogin(event) {
     event.preventDefault();
-    // Recoger datos del formulario
+
     const datos = {
         rol: document.getElementById('rol')?.value.trim(),
         usuario: document.getElementById('usuario')?.value.trim(),
         contrasena: document.getElementById('contrasena')?.value
     };
-    // Validaciones basicas
+
     if (!datos.rol || !datos.usuario || !datos.contrasena) {
         mostrarMensaje('Todos los campos son obligatorios', 'error');
         return false;
     }
-    // Validar formato de correo institucional
+
     const correoRegex = /^[^\s@]+@(uleam\.edu\.ec|live\.uleam\.edu\.ec)$/i;
     if (!correoRegex.test(datos.usuario)) {
         mostrarMensaje('Solo se permiten correos institucionales (@uleam.edu.ec o @live.uleam.edu.ec)', 'error');
         return false;
     }
-    // Validar complejidad de la contraseña
+
     const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passRegex.test(datos.contrasena)) {
         mostrarMensaje('La contraseña debe tener al menos 8 caracteres e incluir mayúsculas, minúsculas, números y caracteres especiales', 'error');
         return false;
     }
-    // Validar rol seleccionado
+
     const rolesValidos = ['admin', 'medico', 'enfermera'];
     if (!rolesValidos.includes(datos.rol)) {
         mostrarMensaje('Rol no válido', 'error');
         return false;
     }
-    // Simular autenticación exitosa
+
     const rolTexto = document.querySelector(`#rol option[value="${datos.rol}"]`)?.textContent || datos.rol;
     const tiempoLogin = new Date().toISOString();
-    // Guardar sesión activa en variable global y localStorage
+    
     window.sesionActiva = {
         usuario: datos.usuario,
         rol: rolTexto,
         activa: true,
         ultimoAcceso: tiempoLogin
     };
-    // Guardar en localStorage
+
     try {
         const sesionData = {
             usuario: datos.usuario,
@@ -606,62 +655,62 @@ function validarLogin(event) {
     } catch (e) {
         console.warn('No se pudo guardar la sesión en localStorage');
     }
-    // Mostrar mensaje de bienvenida
+
     mostrarMensaje(`¡Bienvenido ${rolTexto}!`, 'exito');
-    // Redirigir a la página principal después de un breve retraso
+
     setTimeout(() => {
         // Redirigir siempre a la página principal tras iniciar sesión
         window.location.href = 'PagPrincipal.html';
     }, 500);
-    // Evita el envío del formulario
+
     return false;
 }
-// Obtiene la ruta de destino según el rol seleccionado
+
 function obtenerRutaDestino(rol) {
     if (!rol) {
         mostrarMensaje('Debe seleccionar un rol', 'error');
         return 'Inicio.html';
     }
-// Mapeo de roles a rutas
+
     const rutas = {
         admin: 'PagPrincipal.html',
         medico: 'Pacientes.html',
         enfermera: 'Citas.html'
     };
-    // Devolver la ruta correspondiente o la página de inicio por defecto
+
     return rutas[rol] || 'Inicio.html';
 }
-// Valida el formulario de olvido de contraseña
+
 function validarOlvidoContrasena(event) {
     if (event && typeof event.preventDefault === 'function') event.preventDefault();
-    // Recoger el correo ingresado
+
     const ingreso = prompt('Ingrese su correo institucional para recuperar la contraseña:');
     if (ingreso === null) return false;
-    // Validar el correo ingresado
+
     const correo = ingreso.trim();
     if (!correo) {
         mostrarMensaje('Debe ingresar un correo electrónico', 'error');
         return false;
     }
-    // Validar formato de correo institucional
+
     const correoRegex = /^[^\s@]+@(uleam\.edu\.ec|live\.uleam\.edu\.ec)$/i;
     if (!correoRegex.test(correo)) {
         mostrarMensaje('Sólo se permiten correos institucionales (@uleam.edu.ec o @live.uleam.edu.ec)', 'error');
         return false;
     }
-    // Verificar si el correo existe en la "base de datos"
+
     const existePaciente = baseDatos.pacientes.some(p => p.email && p.email.toLowerCase() === correo.toLowerCase());
     const existeMedico = baseDatos.medicos.some(m => m.correo && m.correo.toLowerCase() === correo.toLowerCase());
-    // Si no existe, mostrar mensaje de error
+
     if (!existePaciente && !existeMedico) {
         mostrarMensaje('El correo no está registrado en el sistema', 'error');
         return false;
     }
-    // Simular envío de correo de recuperación
+
     mostrarMensaje(`Si el correo existe, se ha enviado un enlace de recuperación a ${correo}`, 'exito');
     return false;
 }
-// Valida el formulario de registro de pacientes
+
 function validarPacientes() {
     const datos = {
         nombres: document.getElementById('nombres')?.value.trim() || '',
@@ -672,28 +721,29 @@ function validarPacientes() {
         tipoSangre: document.getElementById('tipoSangre')?.value || '',
         email: document.getElementById('email')?.value.trim() || ''
     };
-    // Validaciones
+
     if (!validarCampoVacio(datos.nombres, 'Nombres y Apellidos')) return false;
     if (!validarLongitudMinima(datos.nombres, 5, 'Nombres y Apellidos')) return false;
     if (!validarSoloLetras(datos.nombres, 'Nombres y Apellidos')) return false;
+    
     if (!validarCedulaEcuatoriana(datos.cedula)) return false;
     if (cedulaYaExiste(datos.cedula)) {
         mostrarMensaje('Esta cédula ya está registrada en el sistema', 'error');
         return false;
     }
-    // Validar fecha de nacimiento
+
     if (!validarFecha(datos.fechaNacimiento, 'nacimiento')) return false;
-    // Validar campos de selección
+
     const camposSeleccion = [
         { valor: datos.sexo, nombre: 'sexo' },
         { valor: datos.estadoCivil, nombre: 'estado civil' },
         { valor: datos.tipoSangre, nombre: 'tipo de sangre' }
     ];
-    // Validar cada campo de selección
+
     for (const campo of camposSeleccion) {
         if (!validarCampoVacio(campo.valor, campo.nombre)) return false;
     }
-    // Validar correo electrónico si se proporcionó
+
     if (datos.email) {
         if (!validarEmail(datos.email)) return false;
         if (emailYaExiste(datos.email)) {
@@ -701,7 +751,7 @@ function validarPacientes() {
             return false;
         }
     }
-    // Si pasa todas las validaciones, guardar el paciente
+
     const paciente = {
         id: Date.now().toString(),
         nombres: datos.nombres,
@@ -714,26 +764,26 @@ function validarPacientes() {
         email: datos.email || '',
         fechaRegistro: new Date().toLocaleString()
     };
-    // Guardar en "base de datos"
+
     baseDatos.pacientes.push(paciente);
     guardarDatos();
     mostrarMensaje('Paciente registrado exitosamente', 'exito');
     renderListaPacientes();
     cargarOpcionesPacientes();
     actualizarTodoTrasCarga();
-    // Mostrar resumen del paciente registrado después de un breve retraso
+
     setTimeout(() => {
         mostrarMensaje(`Paciente: ${datos.nombres} | Cédula: ${datos.cedula}`, 'info');
     }, 2000);
 
     return false;
 }
-// Valida el formulario de registro de citas médicas
+
 function validarCitas() {
     let pacienteCampo = document.getElementById('paciente');
     let paciente = '';
     let cedula = document.getElementById('cedula')?.value.trim();
-    // Obtener el nombre del paciente según el tipo de campo (select o input)
+    
     if (pacienteCampo) {
         if (pacienteCampo.tagName === 'SELECT') {
             const selectedId = pacienteCampo.value;
@@ -744,37 +794,44 @@ function validarCitas() {
             paciente = pacienteCampo.value.trim();
         }
     }
+    
     const medico = document.getElementById('medico')?.value.trim();
     const fecha = document.getElementById('fecha')?.value;
     const consultorio = document.getElementById('consultorio')?.value.trim();
     const estado = document.getElementById('estado')?.value;
+    
     if (!paciente) {
         mostrarMensaje('Debe seleccionar un paciente', 'error');
         return false;
     }
+    
     if (!cedula) {
         mostrarMensaje('La cédula del paciente es requerida', 'error');
         return false;
     }
+    
     const pacienteExiste = baseDatos.pacientes.find(p => p.cedula === cedula);
     if (!pacienteExiste) {
         mostrarMensaje('Esta cédula no está registrada. Debe registrar al paciente primero.', 'error');
         return false;
     }
+    
     if (!medico) {
         mostrarMensaje('Debe seleccionar un médico', 'error');
         return false;
     }
+    
     if (!fecha) {
         mostrarMensaje('Debe seleccionar fecha y hora de la cita', 'error');
         return false;
     }
+   
     if (!validarCampoVacio(consultorio, 'Consultorio Asignado')) return false;
     if (!estado) {
         mostrarMensaje('Debe seleccionar el estado de la cita', 'error');
         return false;
     }
-    // Validar cita
+    
     const cita = {
         id: Date.now().toString(),
         paciente,
@@ -786,26 +843,28 @@ function validarCitas() {
         observaciones: document.getElementById('observaciones')?.value.trim() || '',
         fechaRegistro: new Date().toLocaleString()
     };
-    // Guardar en "base de datos"
+    
     baseDatos.citas.push(cita);
     guardarDatos();
     mostrarMensaje('Cita médica registrada exitosamente', 'exito');
     actualizarTodoTrasCarga();
-    // Mostrar resumen de la cita registrada después de un breve retraso
+    
     setTimeout(() => {
         mostrarMensaje(`Cita para ${paciente} | Fecha: ${new Date(fecha).toLocaleString()}`, 'info');
     }, 2000);
-    // Evita el envío del formulario
+    
     return false;
 }
-// Valida el formulario de registro de médicos
+
 function validarMedicos() {
     const nombre = document.getElementById('nombre')?.value.trim();
     const especialidad = document.getElementById('especialidad')?.value.trim();
     const telefono = document.getElementById('telefono')?.value.trim();
     const correo = document.getElementById('correo')?.value.trim();
     // El horario ahora se recoge desde la UI de horario recurrente (por días y franjas)
+
     if (!validarCampoVacio(nombre, 'Nombres y Apellidos')) return false;
+    
     const regexMedico = /^(Dr\.|Dra\.)?\s*[A-Za-záéíóúÁÉÍÓÚñÑ]+(\s+[A-Za-záéíóúÁÉÍÓÚñÑ]+)*$/;
     
     if (!regexMedico.test(nombre)) {
@@ -827,7 +886,7 @@ function validarMedicos() {
     const diasOrder = ['lun','mar','mie','jue','vie','sab','dom'];
     const franjasWrapper = document.getElementById('franjasPorDia');
     const schedule = { recurrente: [], excepciones: [] };
-    // Recorrer cada día y recoger sus franjas
+
     diasOrder.forEach(day => {
         const dayContainer = franjasWrapper.querySelector(`.franjas[data-day="${day}"]`);
         if (!dayContainer) return;
@@ -847,12 +906,12 @@ function validarMedicos() {
             schedule.recurrente.push({ dias: [day], franjas });
         }
     });
-    // Validar que al menos un día tenga franjas
+
     if (schedule.recurrente.length === 0) {
         mostrarMensaje('Debe definir al menos una franja de atención en algún día', 'error');
         return false;
     }
-    // Validar solapamientos en franjas
+    
     const medico = {
         id: Date.now().toString(),
         nombre: nombre.startsWith('Dr.') || nombre.startsWith('Dra.') ? nombre : `Dr${nombre.includes('María') || nombre.includes('Ana') ? 'a' : ''}. ${nombre}`,
@@ -862,7 +921,7 @@ function validarMedicos() {
     horario: schedule,
         fechaRegistro: new Date().toLocaleString()
     };
-    // Guardar en "base de datos"
+    
     baseDatos.medicos.push(medico);
     guardarDatos();
     mostrarMensaje('Médico registrado exitosamente', 'exito');
@@ -872,10 +931,10 @@ function validarMedicos() {
     setTimeout(() => {
         mostrarMensaje(`Dr(a). ${nombre} | Especialidad: ${especialidad}`, 'info');
     }, 1000);
-    // Evita el envío del formulario
+    
     return false;
 }
-// Valida el formulario de registro de especialidades médicas
+
 function validarEspecialidad() {
     const especialidad = document.getElementById('especialidad')?.value;
     const descripcion = document.getElementById('descripcion')?.value.trim();
@@ -914,12 +973,12 @@ function validarEspecialidad() {
     guardarDatos();
     return true;
 }
-// Valida el formulario de facturación
+
 function validarFacturacion() {
     let pacienteCampo = document.getElementById('paciente');
     let paciente = '';
     let cedula = document.getElementById('cedula')?.value.trim();
-    // Obtener el nombre del paciente según el tipo de campo (select o input)
+    
     if (pacienteCampo) {
         if (pacienteCampo.tagName === 'SELECT') {
             const selId = pacienteCampo.value;
@@ -929,7 +988,8 @@ function validarFacturacion() {
         } else {
             paciente = pacienteCampo.value.trim();
         }
-    } 
+    }
+    
     const medico = document.getElementById('medico')?.value;
     const servicio = document.getElementById('servicio')?.value;
     const costo = document.getElementById('costo')?.value;
@@ -959,7 +1019,7 @@ function validarFacturacion() {
         mostrarMensaje('Debe seleccionar la fecha de emisión', 'error');
         return false;
     }
-    // Crear objeto de factura
+    
     const factura = {
         id: Date.now(),
         numeroFactura: 'FACT-' + Date.now(),
@@ -972,21 +1032,22 @@ function validarFacturacion() {
         fecha,
         fechaRegistro: new Date().toLocaleString()
     };
-    // Guardar en "base de datos"
+    
     baseDatos.facturas.push(factura);
     guardarDatos();
     mostrarMensaje('✓ Factura generada exitosamente', 'exito');
     actualizarTodoTrasCarga();
-    // Mostrar resumen de la factura generada después de un breve retraso
+    
     window.lastSavedFacturaId = factura.id;
     localStorage.setItem('lastSavedFacturaId', factura.id);
+    
     setTimeout(() => {
         mostrarMensaje(`Factura ${factura.numeroFactura} | Total: ${costo}`, 'info');
     }, 1000);
-    // Evita el envío del formulario
+    
     return false;
 }
-// Valida el formulario de generación de reportes
+
 function validarReportes() {
     const fechaInicio = document.getElementById('fechaInicio')?.value;
     const fechaFin = document.getElementById('fechaFin')?.value;
@@ -994,6 +1055,7 @@ function validarReportes() {
     let pacienteCampo = document.getElementById('paciente');
     let paciente = '';
     let pacienteId = '';
+    
     if (pacienteCampo) {
         if (pacienteCampo.tagName === 'SELECT') {
             pacienteId = pacienteCampo.value;
@@ -1003,11 +1065,14 @@ function validarReportes() {
             paciente = pacienteCampo.value.trim();
         }
     }
+    
     const medico = document.getElementById('medico')?.value.trim();
+    
     if (!paciente && !medico && !fechaInicio && !fechaFin && !tipoReporte) {
         mostrarMensaje('Debe seleccionar al menos un criterio de búsqueda', 'error');
         return false;
     }
+    
     if (fechaInicio && fechaFin) {
         const inicio = new Date(fechaInicio);
         const fin = new Date(fechaFin);
@@ -1016,7 +1081,7 @@ function validarReportes() {
             return false;
         }
     }
-    // Filtrar resultados según los criterios
+    
     let resultados = [];
     const inicio = fechaInicio ? new Date(fechaInicio) : null;
     const fin = fechaFin ? new Date(fechaFin) : null;
@@ -1030,20 +1095,21 @@ function validarReportes() {
     if (pacienteId) {
         const nombrePaciente = paciente;
         let todos = [];
+        
         const cedulaPaciente = baseDatos.pacientes.find(p => String(p.id) === String(pacienteId))?.cedula;
-        // Buscar en todas las colecciones relacionadas con el paciente
+        
         todos = todos.concat((baseDatos.citas || []).filter(c => String(c.cedula) === String(cedulaPaciente)));
         todos = todos.concat((baseDatos.facturas || []).filter(f => String(f.cedula) === String(cedulaPaciente)));
-        // Agregar más colecciones si es necesario
+        
         const pObj = baseDatos.pacientes.find(p => String(p.id) === String(pacienteId));
         if (pObj) todos.push(pObj);
-        // Filtrar por médico y fechas
+        
         resultados = todos.filter(r => {
             if (medico) {
                 if (r.medico && !incluyeTexto(r.medico, medico)) return false;
                 if (r.responsable && !incluyeTexto(r.responsable, medico)) return false;
             }
-            // Filtrar por fechas
+            
             if (inicio || fin) {
                 const fechaStr = r.fecha || r.fechaRegistro;
                 if (!fechaStr) return false;
@@ -1052,16 +1118,16 @@ function validarReportes() {
                 if (inicio && f < inicio) return false;
                 if (fin && f > (new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 23, 59, 59))) return false;
             }
-            return true; // Si pasa todos los filtros, incluir el registro
+            return true;
         });
-        // Mostrar resultados
+        
         mostrarMensaje(`Reporte generado: ${resultados.length} resultado(s)`, 'exito');
         lastReportResults = resultados;
         lastReportType = tipoReporte;
         renderListaReportes(resultados, tipoReporte);
         return false;
     }
-    // Seleccionar la colección según el tipo de reporte
+
     if (!tipoReporte || tipoReporte === 'consultas') {
         resultados = [...baseDatos.citas];
     } else if (tipoReporte === 'especialidades') {
@@ -1071,7 +1137,7 @@ function validarReportes() {
     } else if (tipoReporte === 'pacientes') {
         resultados = [...baseDatos.pacientes];
     }
-    // Aplicar filtros
+    
     resultados = resultados.filter(r => {
         if (paciente) {
             if (r.paciente) {
@@ -1080,6 +1146,7 @@ function validarReportes() {
                 if (!incluyeTexto(r.nombres, paciente)) return false;
             }
         }
+        
         if (medico) {
             if (r.medico && !incluyeTexto(r.medico, medico)) return false;
             if (r.responsable && !incluyeTexto(r.responsable, medico)) return false;
@@ -1093,35 +1160,36 @@ function validarReportes() {
             if (inicio && f < inicio) return false;
             if (fin && f > (new Date(fin.getFullYear(), fin.getMonth(), fin.getDate(), 23, 59, 59))) return false;
         }
-        return true; // Si pasa todos los filtros, incluir el registro
+        return true;
     });
-    // Mostrar resultados
+    
     mostrarMensaje(`Reporte generado: ${resultados.length} resultado(s)`, 'exito');
     lastReportResults = resultados;
     lastReportType = tipoReporte;
     renderListaReportes(resultados, tipoReporte);
     return false;
 }
-// Valida el formulario de historial clínico
+
 function validarHistorial() {
     const inputs = document.querySelectorAll('input[type="number"]');
     const peso = inputs[0]?.value;
     const estatura = inputs[1]?.value;
+    
     if (peso && (parseFloat(peso) < 0.5 || parseFloat(peso) > 300)) {
         mostrarMensaje('El peso debe estar entre 0.5 y 300 kg', 'error');
         return false;
     }
+    
     if (estatura && (parseFloat(estatura) < 0.3 || parseFloat(estatura) > 2.5)) {
         mostrarMensaje('La estatura debe estar entre 0.3 y 2.5 metros', 'error');
         return false;
     }
+    
     mostrarMensaje('Historia clínica guardada exitosamente', 'exito');
     return false;
 }
-// Función reutilizable para mostrar cualquier tipo de lista
-// Crea tarjetas (cards) para cada registro
-// Agrega botones de acción (PDF, Editar, Eliminar)
-// Maneja casos sin datos
+
+// Funciones de renderizado
 function renderizarListaDatos(options) {
     const {
         id,
@@ -1179,9 +1247,10 @@ function renderizarListaDatos(options) {
         html += '</div>';
         lista.innerHTML = html;
     }
+
     container.appendChild(lista);
 }
-// Lista Pacientes
+
 function renderListaPacientes() {
     renderizarListaDatos({
         tipo: 'pacientes',
@@ -1195,7 +1264,7 @@ function renderListaPacientes() {
         ]
     });
 }
-// Lista Medicos
+
 function renderListaMedicos() {
     renderizarListaDatos({
         tipo: 'medicos',
@@ -1214,7 +1283,7 @@ function renderListaMedicos() {
         }
     });
 }
-// Lista Citas
+
 function renderListaCitas() {
     renderizarListaDatos({
         tipo: 'citas',
@@ -1234,7 +1303,7 @@ function renderListaCitas() {
         }
     });
 }
-// Listas Especialidades
+
 function renderListaEspecialidades() {
     renderizarListaDatos({
         tipo: 'especialidades',
@@ -1247,7 +1316,7 @@ function renderListaEspecialidades() {
         ]
     });
 }
-// Lista Facturación
+
 function renderListaFacturas() {
     renderizarListaDatos({
         tipo: 'facturas',
@@ -1269,7 +1338,7 @@ function renderListaFacturas() {
         }
     });
 }
-// Lista Reporte
+
 function renderListaReportes(resultados, tipo) {
     const existente = document.getElementById('lista-reportes');
     if (existente) existente.remove();
@@ -1284,7 +1353,9 @@ function renderListaReportes(resultados, tipo) {
         container.appendChild(lista);
         return;
     }
+
     let html = '<h3>Resultados (' + resultados.length + ')</h3><div class="datos-grid">';
+    
     resultados.forEach(r => {
         if (!r) return;
         
@@ -1334,7 +1405,7 @@ function renderListaReportes(resultados, tipo) {
                     .slice(0, 3)
             };
         }
-        // Determinar tipo para botón PDF
+
         let tipoKey = 'registros';
         if (r.numeroFactura || r.numeroFactura === 0) tipoKey = 'facturas';
         else if (r.especialidad) tipoKey = 'especialidades';
@@ -1364,7 +1435,10 @@ function renderListaReportes(resultados, tipo) {
 }
 
 // Funciones de modal
-// En esta parte podemos editar el registros de cada pagina donde se guarden registros
+// ===============================
+// SECCIÓN 9: Funciones de modal (edición y confirmación)
+// ===============================
+// Permite editar y eliminar registros mediante modales reutilizables
 function openModal({ title = 'Editar', body = '', saveText = 'Guardar', cancelText = 'Cancelar', onSave = null, onCancel = null } = {}) {
     closeModal();
     const overlay = document.createElement('div');
@@ -1402,6 +1476,7 @@ function closeModal() {
 }
 
 // Funciones de edición y eliminación
+// Funciones para editar y eliminar registros de cualquier tipo
 function editRegistro(tipo, id) {
     let registro;
     if (tipo === 'pacientes') registro = baseDatos.pacientes.find(r => String(r.id) === String(id));
@@ -1452,7 +1527,7 @@ function editRegistro(tipo, id) {
     } else {
         body = `<div class="campo"><label>Datos</label><textarea id="modal-json" style="min-height:120px">${escapeHtml(JSON.stringify(registro, null, 2))}</textarea></div>`;
     }
-    // Abrimos el modal con validaciones
+    
     openModal({ 
         title: `Editar ${tipo.slice(0, -1)}`, 
         body, 
@@ -1545,7 +1620,7 @@ function editRegistro(tipo, id) {
         } 
     });
 }
-// Elimina el registro
+
 function deleteRegistro(tipo, id) {
     let registro;
     if (tipo === 'pacientes') registro = baseDatos.pacientes.find(r => String(r.id) === String(id));
@@ -1595,6 +1670,14 @@ function deleteRegistro(tipo, id) {
 }
 
 // Función para confirmar cierre de sesión
+// ===============================
+// SECCIÓN 10: Función para confirmar cierre de sesión
+// ===============================
+// ===============================
+// SECCIÓN 11: Exportación e impresión de reportes (PDF, CSV, Print)
+// ===============================
+// Exportar reporte PDF
+// Imprimir reporte en ventana nueva
 function confirmarCerrarSesion(event, href) {
     if (event) event.preventDefault();
 
@@ -1615,7 +1698,7 @@ function confirmarCerrarSesion(event, href) {
     return false;
 }
 
-// Funciones de exportación de reportes PDF
+// Funciones de exportación de reportes
 function exportReportCSV() {
     if (!lastReportResults || lastReportResults.length === 0) {
         mostrarMensaje('No hay resultados para exportar', 'error');
@@ -1643,7 +1726,7 @@ function exportReportCSV() {
     a.remove();
     URL.revokeObjectURL(url);
 }
-// Exportar reporte
+
 function exportReportPDF() {
     if (!lastReportResults || lastReportResults.length === 0) {
         mostrarMensaje('No hay resultados para exportar', 'error');
@@ -1688,7 +1771,7 @@ function exportReportPDF() {
     
     doc.save(`reporte_${lastReportType || 'datos'}_${Date.now()}.pdf`);
 }
-// Imprimir reporte
+
 function printReport() {
     const area = document.getElementById('lista-reportes');
     if (!area) {
@@ -1711,6 +1794,18 @@ function printReport() {
 }
 
 // Funciones de PDF
+// ===============================
+// SECCIÓN 12: Funciones de generación de PDF personalizados
+// ===============================
+// Contenido del PDF según el tipo de entidad
+// Encabezado institucional para PDF
+// Contenido PDF: Paciente
+// Contenido PDF: Médico
+// Contenido PDF: Cita
+// Contenido PDF: Factura
+// Pie de página para PDF
+// Generar nombre de archivo PDF
+// Buscar datos para PDF según tipo e ID
 async function generarPDF(tipo, id) {
     try {
         if (!window.jspdf) {
@@ -1741,7 +1836,7 @@ async function generarPDF(tipo, id) {
         return false;
     }
 }
-// Contenido del PDF
+
 async function generarContenidoPDF(doc, tipo, datos) {
     doc.setDrawColor(...PDF_CONFIG.colors.primary);
     doc.setTextColor(...PDF_CONFIG.colors.primary);
@@ -1762,7 +1857,7 @@ async function generarContenidoPDF(doc, tipo, datos) {
     
     doc.setTextColor(0, 0, 0);
     let yPos = 80;
-    // Tipo de contenido generado
+    
     switch(tipo) {
         case 'pacientes':
             yPos = await generarContenidoPaciente(doc, datos, yPos);
@@ -1780,7 +1875,7 @@ async function generarContenidoPDF(doc, tipo, datos) {
 
     agregarPiePagina(doc);
 }
-// Encabezado
+
 async function agregarEncabezadoInstitucional(doc) {
     try {
         doc.addImage('LOGO-ULEAM-VERTICAL.png', 'PNG', 20, 15, 20, 20);
@@ -1796,7 +1891,7 @@ async function agregarEncabezadoInstitucional(doc) {
     doc.setFont('helvetica', 'normal');
     doc.text('Sistema de Gestión Médica', 105, 30, { align: 'center' });
 }
-// Contenido Paciente
+
 async function generarContenidoPaciente(doc, datos, yPos) {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -1840,7 +1935,7 @@ async function generarContenidoPaciente(doc, datos, yPos) {
 
     return yPos;
 }
-// Contenido Médico
+
 async function generarContenidoMedico(doc, datos, yPos) {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -1870,7 +1965,7 @@ async function generarContenidoMedico(doc, datos, yPos) {
 
     return yPos;
 }
-// Contenido Cita
+
 async function generarContenidoCita(doc, datos, yPos) {
     const paciente = baseDatos.pacientes.find(p => p.cedula === datos.cedula);
     
@@ -1912,7 +2007,7 @@ async function generarContenidoCita(doc, datos, yPos) {
 
     return yPos;
 }
-// Contenido Factura
+
 async function generarContenidoFactura(doc, datos, yPos) {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
@@ -2020,7 +2115,7 @@ async function generarContenidoFactura(doc, datos, yPos) {
 
     return yPos;
 }
-// Pie de página
+
 function agregarPiePagina(doc) {
     const pageCount = doc.internal.getNumberOfPages();
     doc.setFontSize(8);
@@ -2036,13 +2131,17 @@ function agregarPiePagina(doc) {
         doc.text(`Página ${i} de ${pageCount}`, 105, 290, { align: 'center' });
     }
 }
-// Nombre del PDF
+
+function capitalizarPalabra(palabra) {
+    return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+}
+
 function generarNombreArchivo(tipo, id, datos) {
     const fecha = new Date().toISOString().split('T')[0];
     const identificador = datos.cedula || datos.numero || datos.numeroFactura || id;
     return `${tipo}_${identificador}_${fecha}.pdf`;
 }
-// Datos del PDF, busca un registro específico por tipo e ID
+
 function obtenerDatosParaPDF(tipo, id) {
     switch(tipo) {
         case 'pacientes':
@@ -2059,6 +2158,12 @@ function obtenerDatosParaPDF(tipo, id) {
 }
 
 // Función para actualizar todo tras la carga
+// ===============================
+// SECCIÓN 13: Refresco global de la UI tras la carga de datos
+// ===============================
+// ===============================
+// SECCIÓN 14: Inicialización global al cargar la página (DOMContentLoaded)
+// ===============================
 function actualizarTodoTrasCarga() {
     if (document.getElementById('formPacientes')) renderListaPacientes();
     if (document.getElementById('formCitas')) renderListaCitas();
@@ -2078,13 +2183,13 @@ function actualizarTodoTrasCarga() {
             if (!this.value && cedulaInput) cedulaInput.value = '';
         });
     }
-    // Estado del formulario
+    
     const bindForm = (id, handler) => {
         const f = document.getElementById(id);
-        if (!f) return; // No existe
-        if (f.__validaciones_attached) return; // Ya configurado
+        if (!f) return;
+        if (f.__validaciones_attached) return;
         f.addEventListener('submit', function(e) {
-            e.preventDefault(); // Evita recarga
+            e.preventDefault();
             try {
                 if (handler.length === 1) handler(e); else handler();
                 if (typeof renderListaPacientes === 'function') renderListaPacientes();
@@ -2096,10 +2201,9 @@ function actualizarTodoTrasCarga() {
                 console.error(`Error manejando submit de ${id}:`, err);
             }
         });
-        // Marca como configurado
         f.__validaciones_attached = true;
     };
-    // Vincula formularios con respectiva validación
+    
     bindForm('formPacientes', validarPacientes);
     bindForm('formMedicos', validarMedicos);
     bindForm('formEspecialidad', validarEspecialidad);
@@ -2107,7 +2211,7 @@ function actualizarTodoTrasCarga() {
     bindForm('formHistorial', validarHistorial);
     bindForm('formReportes', validarReportes);
     bindForm('formLogin', validarLogin);
-    // Actualizar contadores
+    
     const contadorPacientes = document.getElementById('total-pacientes');
     const contadorMedicos = document.getElementById('total-medicos');
     const contadorCitas = document.getElementById('total-citas');
@@ -2117,7 +2221,7 @@ function actualizarTodoTrasCarga() {
     if (contadorMedicos) contadorMedicos.textContent = baseDatos.medicos.length;
     if (contadorCitas) contadorCitas.textContent = baseDatos.citas.length;
     if (contadorEspecialidades) contadorEspecialidades.textContent = baseDatos.especialidades.length;
-    // Esta parte revisa si cada tabla está dentro de un contenedor "data-card". Si NO está, lo crea.
+
     const tablas = document.querySelectorAll('.container table');
     tablas.forEach(tbl => {
         if (!tbl.closest('.data-card')) {
@@ -2129,7 +2233,35 @@ function actualizarTodoTrasCarga() {
     });
 }
 
-// Cuando la página termine de cargar, ejecuta todo este códig
+function actualizarInterfaz() {
+    actualizarTodoTrasCarga();
+}
+
+function actualizarSelectores() {
+    cargarOpcionesPacientes();
+    cargarOpcionesMedicos();
+}
+
+function cargarDatosIniciales() {
+    if (!baseDatos.pacientes.length) {
+        baseDatos.pacientes = [];
+    }
+    if (!baseDatos.medicos.length) {
+        baseDatos.medicos = [];
+    }
+    if (!baseDatos.citas.length) {
+        baseDatos.citas = [];
+    }
+    if (!baseDatos.especialidades.length) {
+        baseDatos.especialidades = [];
+    }
+    if (!baseDatos.facturas.length) {
+        baseDatos.facturas = [];
+    }
+    guardarDatos();
+}
+
+// Event Listeners principales
 document.addEventListener('DOMContentLoaded', function() {
     cargarDatos();
     cargarDatosIniciales();
