@@ -1,6 +1,4 @@
-/* =============================== */
 /* SECCIÓN 1: Listas y tarjetas de datos */
-/* =============================== */
 /* Cuadros para reportes y datos (estilo pacientes) */
 /* Contenedor principal de listas de datos */
 .lista-datos {
@@ -176,10 +174,7 @@
   filter: brightness(1.1);
   transform: translateY(-1px);
 }
-/* Paleta de colores y sombras */
-/* =============================== */
 /* SECCIÓN 2: Variables CSS globales y colores */
-/* =============================== */
 :root {
   --primario: #c10e1a;
   --primario-oscuro: #9e0f18;
@@ -195,10 +190,7 @@
   --sombra-lg: 0 8px 30px rgba(0,0,0,0.15);
   --transicion: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* =============================== */
 /* SECCIÓN 3: Reset y estilos base */
-/* =============================== */
-/* Base General */
 * {
   margin: 0;
   padding: 0;
@@ -223,12 +215,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-/* =============================== */
 /* SECCIÓN 4: Encabezado institucional y logo */
-/* =============================== */
-/* Encabezado Uleam */
-/* Contenedor del encabezado y logo */
 .encabezado-contenido {
   display: flex;
   align-items: center;
@@ -304,10 +291,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Título de la página */
-/* =============================== */
 /* SECCIÓN 5: Header principal de la página */
-/* =============================== */
 header {
   background: linear-gradient(135deg, var(--primario) 0%, var(--primario-oscuro) 100%);
   color: var(--blanco);
@@ -345,10 +329,7 @@ header::before {
   100% { left: 100%; }
 }
 
-/* Contenerdor */
-/* =============================== */
 /* SECCIÓN 6: Contenedor principal de páginas */
-/* =============================== */
 .container {
   width: 95%;
   max-width: 1100px;
@@ -365,10 +346,7 @@ header::before {
   border-top: none;
 }
 
-/* =============================== */
 /* SECCIÓN 7: Botón de retorno */
-/* =============================== */
-/* Botón de retorno - estilo moderno y reutilizable */
 .boton-retorno {
   display: flex;
   justify-content: flex-start;
@@ -419,10 +397,7 @@ header::before {
   }
 }
 
-/* =============================== */
 /* SECCIÓN 8: Formularios y campos */
-/* =============================== */
-/* Formulario flotante */
 form {
   display: flex;
   flex-direction: column;
@@ -464,10 +439,7 @@ form {
 }
 .data-card p { margin: 0; padding: 6px 0; }
 
-/* =============================== */
 /* SECCIÓN 9: Modal reutilizable para edición y confirmaciones */
-/* =============================== */
-/* Modal reutilizable para edición y confirmaciones */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -630,10 +602,7 @@ select:focus {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c10e1a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 
-/* =============================== */
 /* SECCIÓN 10: Botones y estilos de interacción */
-/* =============================== */
-/* Botones con hover difuminado */
 button,
 .btn {
   display: inline-block;
@@ -714,10 +683,7 @@ button[type="button"],
   color: var(--gris-oscuro);
 }
 
-/* =============================== */
 /* SECCIÓN 11: Mensajes de validación (toast) */
-/* =============================== */
-/* Mensajes de validación (toast) - cuadro llamativo y accesible */
 .mensaje-validacion {
   position: fixed;
   top: 20px;
@@ -801,10 +767,7 @@ button[type="button"]:hover,
   min-width: 140px;
 }
 
-/* =============================== */
 /* SECCIÓN 12: Tablas y estilos de filas */
-/* =============================== */
-/* Tablas */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -847,10 +810,7 @@ tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* =============================== */
 /* SECCIÓN 13: Tarjetas y cards de resumen */
-/* =============================== */
-/* Tarjetas */
 .card {
   background: var(--blanco);
   border-radius: 12px;
@@ -889,11 +849,7 @@ tbody tr:last-child td {
   gap: 20px;
   margin: 20px 0;
 }
-
-/* =============================== */
 /* SECCIÓN 14: Insignias y badges */
-/* =============================== */
-/* Insigneas */
 .badge {
   display: inline-block;
   padding: 5px 14px;
@@ -923,10 +879,7 @@ tbody tr:last-child td {
   color: var(--blanco);
 }
 
-/* =============================== */
 /* SECCIÓN 15: Cargador (spinner) */
-/* =============================== */
-/* Cargador */
 .spinner {
   border: 4px solid var(--gris-claro);
   border-top: 4px solid var(--primario);
@@ -942,10 +895,7 @@ tbody tr:last-child td {
   100% { transform: rotate(360deg); }
 }
 
-/* =============================== */
 /* SECCIÓN 16: Utilidades y helpers de clases */
-/* =============================== */
-/* Utilidades */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -978,10 +928,7 @@ tbody tr:last-child td {
 .rounded-lg { border-radius: 12px; }
 .rounded-full { border-radius: 9999px; }
 
-/* =============================== */
 /* SECCIÓN 17: Barra de desplazamiento personalizada */
-/* =============================== */
-/* Barra de desplazamiento personalizado */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -1001,10 +948,7 @@ tbody tr:last-child td {
   background: linear-gradient(135deg, var(--primario-claro) 0%, var(--primario) 100%);
 }
 
-/* =============================== */
 /* SECCIÓN 18: Diseño responsivo (media queries) */
-/* =============================== */
-/* Diseño responsivo */
 @media (max-width: 768px) {
   .encabezado-contenido {
     padding: 12px 20px;
@@ -1087,10 +1031,7 @@ tbody tr:last-child td {
   }
 }
 
-/* =============================== */
 /* SECCIÓN 19: Animaciones adicionales */
-/* =============================== */
-/* Animaciones adicionales */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

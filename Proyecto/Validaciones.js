@@ -1,8 +1,4 @@
-// Parte 1. Variables de almacenamiento y configuración
-// Esta parte funciona como una base de datos en localstore, aunque no es una base de datos como tal pero cumple con la de guardar datos
-// ===============================
 // SECCIÓN 1: Variables de almacenamiento y configuración
-// ===============================
 // Esta parte funciona como una "base de datos" local usando localStorage y define la configuración global del sistema y de los PDFs.
 const baseDatos = {
     pacientes: [],
@@ -32,22 +28,18 @@ const PDF_CONFIG = {
         small: { size: 10, style: 'normal' }
     }
 };
-// Variables para el sistema de reportes
+
 // Variables globales para el sistema de reportes y facturación
 let lastReportResults = []; 
 let lastReportType = ''; 
 let lastSavedFacturaId = null; 
-// Asegurar que las funciones de PDF estén disponibles globalmente
+
 // Asegura que las funciones de PDF estén disponibles globalmente
 if (typeof window !== 'undefined') { 
     window.PDF_CONFIG = PDF_CONFIG;
 }
 
-// Parte 2. Validaciones reutilizables que compruebas datos comunes
-// Objeto de validaciones
-// ===============================
 // SECCIÓN 2: Validaciones reutilizables y helpers
-// ===============================
 // Funciones y expresiones regulares para validar campos comunes (vacío, longitud, solo letras, email, etc.)
 const validaciones = { 
     validarCampoVacio(valor, nombreCampo) { 
@@ -81,15 +73,10 @@ const validaciones = {
         return true;
     }
 };
-// Exportar funciones de validación
 // Exporta funciones de validación para uso global
 const { validarCampoVacio, validarLongitudMinima, validarSoloLetras, validarEmail } = validaciones;
 
-// Parte 3. Guardamos y cargamos datos
-// Funciones de persistencia
-// ===============================
 // SECCIÓN 3: Persistencia de datos (guardar y cargar)
-// ===============================
 // Funciones para guardar y cargar datos en localStorage
 function guardarDatos() {
     try {
@@ -124,11 +111,8 @@ function cargarDatos() {
         console.error('Error cargando datos desde localStorage', e);
     }
 }
-// Parte 4. Limpieza de datos y helpers de seguridad
-// Inicialización y limpieza de datos
-// ===============================
+
 // SECCIÓN 4: Limpieza de datos y helpers de seguridad
-// ===============================
 // Funciones para limpiar, sanitizar y mostrar mensajes en la UI
 function sanitizeEspecialidades() {
     if (!Array.isArray(baseDatos.especialidades)) {
@@ -149,7 +133,6 @@ function sanitizeEspecialidades() {
     baseDatos.especialidades = cleaned;
 }
 
-// 
 // Función para mostrar mensajes al usuario
 function mostrarMensaje(mensaje, tipo = 'error') {
     const mensajeAnterior = document.querySelector('.mensaje-validacion');
@@ -273,8 +256,6 @@ function collectHorarioFromDOM() {
     return result;
 }
 
-
-// Función auxiliar para escapar HTML
 // Función auxiliar para escapar HTML y evitar XSS
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -282,10 +263,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Funciones de carga de opciones
-// ===============================
 // SECCIÓN 5: Helpers de carga dinámica de opciones en formularios
-// ===============================
 // Carga selectores de pacientes y médicos dinámicamente
 function cargarOpcionesPacientes() {
     const pacienteSelects = document.querySelectorAll('select#paciente, select[name="paciente"]');
@@ -316,7 +294,6 @@ function cargarOpcionesPacientes() {
     });
 }
 
-// Inicializar UI de horario recurrente para médicos
 // Inicializa la UI de horarios recurrentes para médicos
 function initHorarioRecurrente() {
     const container = document.getElementById('horarioRecurrente');
@@ -411,10 +388,7 @@ function cargarOpcionesMedicos() {
     });
 }
 
-// Validaciones específicas
-// ===============================
 // SECCIÓN 6: Validaciones específicas de campos y lógica de negocio
-// ===============================
 // Validaciones de cédula, email, teléfono, fechas, edad, IMC, etc.
 function validarCedulaEcuatoriana(cedula) {
     cedula = cedula?.trim() || '';
@@ -592,16 +566,9 @@ function calcularIMC(peso, estatura) {
     return `${imc.toFixed(2)} - ${clasificacion}`;
 }
 
-// Validaciones de formularios
-// ===============================
 // SECCIÓN 7: Validaciones de formularios principales del sistema
-// ===============================
 // Incluye validación de login, olvido de contraseña, pacientes, citas, médicos, especialidades, facturación, reportes, historial
-// ===============================
-// SECCIÓN 8: Renderizado de listas y tarjetas de datos
-// ===============================
-// Función reutilizable para mostrar cualquier tipo de lista como tarjetas (cards) con acciones
-// Renderizado de listas específicas: Pacientes, Médicos, Citas, Especialidades, Facturas
+
 function validarLogin(event) {
     event.preventDefault();
 
@@ -1189,7 +1156,9 @@ function validarHistorial() {
     return false;
 }
 
-// Funciones de renderizado
+// SECCIÓN 8: Renderizado de listas y tarjetas de datos
+// Función reutilizable para mostrar cualquier tipo de lista como tarjetas (cards) con acciones
+// Renderizado de listas específicas: Pacientes, Médicos, Citas, Especialidades, Facturas
 function renderizarListaDatos(options) {
     const {
         id,
@@ -1434,10 +1403,7 @@ function renderListaReportes(resultados, tipo) {
     container.appendChild(lista);
 }
 
-// Funciones de modal
-// ===============================
 // SECCIÓN 9: Funciones de modal (edición y confirmación)
-// ===============================
 // Permite editar y eliminar registros mediante modales reutilizables
 function openModal({ title = 'Editar', body = '', saveText = 'Guardar', cancelText = 'Cancelar', onSave = null, onCancel = null } = {}) {
     closeModal();
@@ -1475,7 +1441,6 @@ function closeModal() {
     if (prev) prev.remove();
 }
 
-// Funciones de edición y eliminación
 // Funciones para editar y eliminar registros de cualquier tipo
 function editRegistro(tipo, id) {
     let registro;
@@ -1669,15 +1634,7 @@ function deleteRegistro(tipo, id) {
     });
 }
 
-// Función para confirmar cierre de sesión
-// ===============================
 // SECCIÓN 10: Función para confirmar cierre de sesión
-// ===============================
-// ===============================
-// SECCIÓN 11: Exportación e impresión de reportes (PDF, CSV, Print)
-// ===============================
-// Exportar reporte PDF
-// Imprimir reporte en ventana nueva
 function confirmarCerrarSesion(event, href) {
     if (event) event.preventDefault();
 
@@ -1698,7 +1655,9 @@ function confirmarCerrarSesion(event, href) {
     return false;
 }
 
-// Funciones de exportación de reportes
+// SECCIÓN 11: Exportación e impresión de reportes (PDF, CSV, Print)
+// Exportar reporte PDF
+// Imprimir reporte en ventana nueva
 function exportReportCSV() {
     if (!lastReportResults || lastReportResults.length === 0) {
         mostrarMensaje('No hay resultados para exportar', 'error');
@@ -1792,11 +1751,7 @@ function printReport() {
     w.focus();
     setTimeout(() => { w.print(); w.close(); }, 500);
 }
-
-// Funciones de PDF
-// ===============================
 // SECCIÓN 12: Funciones de generación de PDF personalizados
-// ===============================
 // Contenido del PDF según el tipo de entidad
 // Encabezado institucional para PDF
 // Contenido PDF: Paciente
@@ -2157,13 +2112,9 @@ function obtenerDatosParaPDF(tipo, id) {
     }
 }
 
-// Función para actualizar todo tras la carga
-// ===============================
+
 // SECCIÓN 13: Refresco global de la UI tras la carga de datos
-// ===============================
-// ===============================
-// SECCIÓN 14: Inicialización global al cargar la página (DOMContentLoaded)
-// ===============================
+// Función para actualizar todas las listas y contadores
 function actualizarTodoTrasCarga() {
     if (document.getElementById('formPacientes')) renderListaPacientes();
     if (document.getElementById('formCitas')) renderListaCitas();
@@ -2260,7 +2211,7 @@ function cargarDatosIniciales() {
     }
     guardarDatos();
 }
-
+// SECCIÓN 14: Inicialización global al cargar la página (DOMContentLoaded)
 // Event Listeners principales
 document.addEventListener('DOMContentLoaded', function() {
     cargarDatos();
