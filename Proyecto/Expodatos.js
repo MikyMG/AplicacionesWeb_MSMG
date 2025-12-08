@@ -1,7 +1,7 @@
 // Exportación XML y JSON
 // Sistema Médico  Policlínico ULEAM
 class DataExportService {
-  // Exportar a XML
+  // Exportación a XML
   static exportToXML(data, tipo = 'completo') {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<sistema_medico>\n';
@@ -10,7 +10,7 @@ class DataExportService {
     if (Array.isArray(data)) {
       xml += this.exportArrayToXML(data, tipo);
     } else {
-      // Exportación completa del sistema
+      // Exportación completa (caso original)
       if (data.pacientes && data.pacientes.length > 0) {
         xml += '  <pacientes>\n';
         data.pacientes.forEach(p => {
@@ -59,33 +59,56 @@ class DataExportService {
   // Exportar array de resultados filtrados
   static exportArrayToXML(array, tipo) {
     let xml = '';
+    let pacientes = [];
+    let citas = [];
+    let especialidades = [];
+    let facturas = [];
     
+    // Clasificar items por tipo
     array.forEach(item => {
-      // Detectar tipo de dato
       if (item.cedula && item.nombres) {
-        // Es un paciente
-        if (!xml.includes('<pacientes>')) xml += '  <pacientes>\n';
-        xml += this.exportPacienteXML(item);
+        pacientes.push(item);
       } else if (item.medico && item.fecha && item.consultorio) {
-        // Es una cita
-        if (!xml.includes('<citas>')) xml += '  <citas>\n';
-        xml += this.exportCitaXML(item);
-      } else if (item.especialidad && item.especialidad) {
-        // Es una especialidad
-        if (!xml.includes('<especialidades>')) xml += '  <especialidades>\n';
-        xml += this.exportEspecialidadXML(item);
+        citas.push(item);
+      } else if (item.especialidad) {
+        especialidades.push(item);
       } else if (item.numeroFactura || item.servicio) {
-        // Es una factura
-        if (!xml.includes('<facturas>')) xml += '  <facturas>\n';
-        xml += this.exportFacturaXML(item);
+        facturas.push(item);
       }
     });
     
-    // Cerrar etiquetas
-    if (xml.includes('<pacientes>')) xml += '  </pacientes>\n';
-    if (xml.includes('<citas>')) xml += '  </citas>\n';
-    if (xml.includes('<especialidades>')) xml += '  </especialidades>\n';
-    if (xml.includes('<facturas>')) xml += '  </facturas>\n';
+    // Generar XML por tipo
+    if (pacientes.length > 0) {
+      xml += '  <pacientes>\n';
+      pacientes.forEach(p => {
+        xml += this.exportPacienteXML(p);
+      });
+      xml += '  </pacientes>\n';
+    }
+    
+    if (citas.length > 0) {
+      xml += '  <citas>\n';
+      citas.forEach(c => {
+        xml += this.exportCitaXML(c);
+      });
+      xml += '  </citas>\n';
+    }
+    
+    if (especialidades.length > 0) {
+      xml += '  <especialidades>\n';
+      especialidades.forEach(e => {
+        xml += this.exportEspecialidadXML(e);
+      });
+      xml += '  </especialidades>\n';
+    }
+    
+    if (facturas.length > 0) {
+      xml += '  <facturas>\n';
+      facturas.forEach(f => {
+        xml += this.exportFacturaXML(f);
+      });
+      xml += '  </facturas>\n';
+    }
     
     return xml;
   }
@@ -121,6 +144,7 @@ class DataExportService {
     xml += `      <consultorio>${this.escapeXML(c.consultorio)}</consultorio>\n`;
     xml += `      <estado>${this.escapeXML(c.estado)}</estado>\n`;
     xml += `      <observaciones>${this.escapeXML(c.observaciones || '')}</observaciones>\n`;
+    xml += `      <fecha_registro>${this.escapeXML(c.fechaRegistro || '')}</fecha_registro>\n`;
     xml += `    </cita>\n`;
     return xml;
   }
@@ -161,13 +185,14 @@ class DataExportService {
     xml += `      <costo moneda="USD">${f.costo || 0}</costo>\n`;
     xml += `      <metodo_pago>${this.escapeXML(f.metodoPago || '')}</metodo_pago>\n`;
     xml += `      <fecha_emision>${this.escapeXML(f.fecha || '')}</fecha_emision>\n`;
+    xml += `      <fecha_registro>${this.escapeXML(f.fechaRegistro || '')}</fecha_registro>\n`;
     xml += `    </factura>\n`;
     return xml;
   }
   
-  // Exportar a JSON
+  // Exportación a JSON
   static exportToJSON(data) {
-    // Si es un array simple de resultados filtrados
+    // Si es un array simple (resultados filtrados)
     if (Array.isArray(data)) {
       return JSON.stringify({ 
         sistema_medico: { 
@@ -227,7 +252,7 @@ class DataExportService {
     return JSON.stringify(jsonData, null, 2);
   }
   
-  // Descargar archivos
+  // Descargar archivo XML o JSON
   static downloadXML(data, filename = 'reporte.xml') {
     try {
       const xmlContent = this.exportToXML(data);
@@ -266,7 +291,7 @@ class DataExportService {
     }
   }
   
-  // Utilidad para escapar caracteres XML
+  // Escapar caracteres especiales para XML
   static escapeXML(text) {
     if (!text) return '';
     return String(text)
@@ -278,7 +303,7 @@ class DataExportService {
   }
 }
 
-// Integración con la interfaz
+// Integrar botones en la interfaz de cada página
 document.addEventListener('DOMContentLoaded', function() {
   const botonesContainer = document.querySelector('.botones');
   
