@@ -1,207 +1,234 @@
 // Exportación XML y JSON
 // Sistema Médico  Policlínico ULEAM
 class DataExportService {
-  
-// Exportación de datos a XML
-static exportToXML(data) {
+  // Exportar a XML
+  static exportToXML(data, tipo = 'completo') {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xml += '<sistema_medico>\n'; 
-// Exportación de Pacientes
-    if (data.pacientes && data.pacientes.length > 0) {
-      xml += '  <pacientes>\n';
-      data.pacientes.forEach(p => {
-        xml += `    <paciente id="${this.escapeXML(p.cedula)}">\n`;
-        xml += `      <datos_personales>\n`;
-        xml += `        <nombres>${this.escapeXML(p.nombres)}</nombres>\n`;
-        xml += `        <cedula>${this.escapeXML(p.cedula)}</cedula>\n`;
-        xml += `        <fecha_nacimiento>${this.escapeXML(p.fechaNacimiento || '')}</fecha_nacimiento>\n`;
-        xml += `        <edad>${p.edad || 0}</edad>\n`;
-        xml += `        <sexo>${this.escapeXML(p.sexo || '')}</sexo>\n`;
-        xml += `        <estado_civil>${this.escapeXML(p.estadoCivil || '')}</estado_civil>\n`;
-        xml += `        <tipo_sangre>${this.escapeXML(p.tipoSangre || '')}</tipo_sangre>\n`;
-        xml += `        <nacionalidad>${this.escapeXML(p.nacionalidad || 'No especificado')}</nacionalidad>\n`;
-        xml += `      </datos_personales>\n`;
-        xml += `      <contacto>\n`;
-        xml += `        <direccion>${this.escapeXML(p.direccion || '')}</direccion>\n`;
-        xml += `        <ciudad>${this.escapeXML(p.ciudad || '')}</ciudad>\n`;
-        xml += `        <provincia>${this.escapeXML(p.provincia || '')}</provincia>\n`;
-        xml += `        <telefono>${this.escapeXML(p.telefono || '')}</telefono>\n`;
-        xml += `        <email>${this.escapeXML(p.email || '')}</email>\n`;
-        xml += `      </contacto>\n`;
-        xml += `      <datos_medicos>\n`;
-        xml += `        <peso unidad="kg">${p.peso || 0}</peso>\n`;
-        xml += `        <estatura unidad="m">${p.estatura || 0}</estatura>\n`;
-        xml += `        <imc>${this.escapeXML(p.imc || '')}</imc>\n`;
-        xml += `        <alergias>${this.escapeXML(p.alergias || '')}</alergias>\n`;
-        xml += `        <enfermedades_cronicas>${this.escapeXML(p.enfermedades || '')}</enfermedades_cronicas>\n`;
-        xml += `        <tratamientos_actuales>${this.escapeXML(p.tratamientos || '')}</tratamientos_actuales>\n`;
-        xml += `      </datos_medicos>\n`;
-        xml += `      <fecha_registro>${this.escapeXML(p.fechaRegistro || '')}</fecha_registro>\n`;
-        xml += `    </paciente>\n`;
-      });
-      xml += '  </pacientes>\n';
-    }
-
-    // Exportación de Citas
-    if (data.citas && data.citas.length > 0) {
-      xml += '  <citas>\n';
-      data.citas.forEach(c => {
-        xml += `    <cita id="${this.escapeXML(c.id)}">\n`;
-        xml += `      <paciente_cedula>${this.escapeXML(c.cedula)}</paciente_cedula>\n`;
-        xml += `      <paciente_nombre>${this.escapeXML(c.paciente)}</paciente_nombre>\n`;
-        xml += `      <medico>${this.escapeXML(c.medico)}</medico>\n`;
-        xml += `      <fecha_hora>${this.escapeXML(c.fecha)}</fecha_hora>\n`;
-        xml += `      <consultorio>${this.escapeXML(c.consultorio)}</consultorio>\n`;
-        xml += `      <estado>${this.escapeXML(c.estado)}</estado>\n`;
-        xml += `      <observaciones>${this.escapeXML(c.observaciones || '')}</observaciones>\n`;
-        xml += `      <fecha_registro>${this.escapeXML(c.fechaRegistro)}</fecha_registro>\n`;
-        xml += `    </cita>\n`;
-      });
-      xml += '  </citas>\n';
+    xml += '<sistema_medico>\n';
+    
+    // Si es un array simple de resultados filtrados
+    if (Array.isArray(data)) {
+      xml += this.exportArrayToXML(data, tipo);
+    } else {
+      // Exportación completa del sistema
+      if (data.pacientes && data.pacientes.length > 0) {
+        xml += '  <pacientes>\n';
+        data.pacientes.forEach(p => {
+          xml += this.exportPacienteXML(p);
+        });
+        xml += '  </pacientes>\n';
+      }
+      
+      if (data.citas && data.citas.length > 0) {
+        xml += '  <citas>\n';
+        data.citas.forEach(c => {
+          xml += this.exportCitaXML(c);
+        });
+        xml += '  </citas>\n';
+      }
+      
+      if (data.medicos && data.medicos.length > 0) {
+        xml += '  <medicos>\n';
+        data.medicos.forEach(m => {
+          xml += this.exportMedicoXML(m);
+        });
+        xml += '  </medicos>\n';
+      }
+      
+      if (data.especialidades && data.especialidades.length > 0) {
+        xml += '  <especialidades>\n';
+        data.especialidades.forEach(e => {
+          xml += this.exportEspecialidadXML(e);
+        });
+        xml += '  </especialidades>\n';
+      }
+      
+      if (data.facturas && data.facturas.length > 0) {
+        xml += '  <facturas>\n';
+        data.facturas.forEach(f => {
+          xml += this.exportFacturaXML(f);
+        });
+        xml += '  </facturas>\n';
+      }
     }
     
-    // Exportación de Médicos
-    if (data.medicos && data.medicos.length > 0) {
-      xml += '  <medicos>\n';
-      data.medicos.forEach(m => {
-        xml += `    <medico id="${this.escapeXML(m.id)}">\n`;
-        xml += `      <nombre>${this.escapeXML(m.nombre)}</nombre>\n`;
-        xml += `      <especialidad>${this.escapeXML(m.especialidad)}</especialidad>\n`;
-        xml += `      <telefono>${this.escapeXML(m.telefono || '')}</telefono>\n`;
-        xml += `      <correo>${this.escapeXML(m.correo)}</correo>\n`;
-        xml += `      <horario>${this.escapeXML(this.formatHorario(m.horario))}</horario>\n`;
-        xml += `      <fecha_registro>${this.escapeXML(m.fechaRegistro)}</fecha_registro>\n`;
-        xml += `    </medico>\n`;
-      });
-      xml += '  </medicos>\n';
-    }
-    
-    // Exportación de Especialidades Médicas
-    if (data.especialidades && data.especialidades.length > 0) {
-      xml += '  <especialidades>\n';
-      data.especialidades.forEach(e => {
-        xml += `    <especialidad id="${e.id}">\n`;
-        xml += `      <nombre>${this.escapeXML(e.especialidad)}</nombre>\n`;
-        xml += `      <descripcion>${this.escapeXML(e.descripcion || '')}</descripcion>\n`;
-        xml += `      <area>${this.escapeXML(e.area || '')}</area>\n`;
-        xml += `      <horario_atencion>${this.escapeXML(e.horario || '')}</horario_atencion>\n`;
-        xml += `      <medico_responsable>${this.escapeXML(e.responsable || '')}</medico_responsable>\n`;
-        xml += `    </especialidad>\n`;
-      });
-      xml += '  </especialidades>\n';
-    }
-    
-    // Exportación de Facturas
-    if (data.facturas && data.facturas.length > 0) {
-      xml += '  <facturas>\n';
-      data.facturas.forEach(f => {
-        xml += `    <factura id="${this.escapeXML(f.numeroFactura || f.id)}">\n`;
-        xml += `      <numero_factura>${this.escapeXML(f.numeroFactura || '')}</numero_factura>\n`;
-        xml += `      <paciente>\n`;
-        xml += `        <nombre>${this.escapeXML(f.paciente || '')}</nombre>\n`;
-        xml += `        <cedula>${this.escapeXML(f.cedula || '')}</cedula>\n`;
-        xml += `      </paciente>\n`;
-        xml += `      <medico>${this.escapeXML(f.medico || '')}</medico>\n`;
-        xml += `      <servicio>${this.escapeXML(f.servicio || '')}</servicio>\n`;
-        xml += `      <descripcion>${this.escapeXML(f.descripcion || '')}</descripcion>\n`;
-        xml += `      <costo moneda="USD">${f.costo || 0}</costo>\n`;
-        xml += `      <metodo_pago>${this.escapeXML(f.metodoPago || '')}</metodo_pago>\n`;
-        xml += `      <fecha_emision>${this.escapeXML(f.fecha || '')}</fecha_emision>\n`;
-        xml += `      <fecha_registro>${this.escapeXML(f.fechaRegistro || '')}</fecha_registro>\n`;
-        xml += `    </factura>\n`;
-      });
-      xml += '  </facturas>\n';
-    }
     xml += '</sistema_medico>';
     return xml;
   }
   
-  // Exportación de datos a JSON
+  // Exportar array de resultados filtrados
+  static exportArrayToXML(array, tipo) {
+    let xml = '';
+    
+    array.forEach(item => {
+      // Detectar tipo de dato
+      if (item.cedula && item.nombres) {
+        // Es un paciente
+        if (!xml.includes('<pacientes>')) xml += '  <pacientes>\n';
+        xml += this.exportPacienteXML(item);
+      } else if (item.medico && item.fecha && item.consultorio) {
+        // Es una cita
+        if (!xml.includes('<citas>')) xml += '  <citas>\n';
+        xml += this.exportCitaXML(item);
+      } else if (item.especialidad && item.especialidad) {
+        // Es una especialidad
+        if (!xml.includes('<especialidades>')) xml += '  <especialidades>\n';
+        xml += this.exportEspecialidadXML(item);
+      } else if (item.numeroFactura || item.servicio) {
+        // Es una factura
+        if (!xml.includes('<facturas>')) xml += '  <facturas>\n';
+        xml += this.exportFacturaXML(item);
+      }
+    });
+    
+    // Cerrar etiquetas
+    if (xml.includes('<pacientes>')) xml += '  </pacientes>\n';
+    if (xml.includes('<citas>')) xml += '  </citas>\n';
+    if (xml.includes('<especialidades>')) xml += '  </especialidades>\n';
+    if (xml.includes('<facturas>')) xml += '  </facturas>\n';
+    
+    return xml;
+  }
+  
+  // Exportar un paciente a XML
+  static exportPacienteXML(p) {
+    let xml = `    <paciente id="${this.escapeXML(p.cedula)}">\n`;
+    xml += `      <datos_personales>\n`;
+    xml += `        <nombres>${this.escapeXML(p.nombres)}</nombres>\n`;
+    xml += `        <cedula>${this.escapeXML(p.cedula)}</cedula>\n`;
+    xml += `        <fecha_nacimiento>${this.escapeXML(p.fechaNacimiento || '')}</fecha_nacimiento>\n`;
+    xml += `        <edad>${p.edad || 0}</edad>\n`;
+    xml += `        <sexo>${this.escapeXML(p.sexo || '')}</sexo>\n`;
+    xml += `        <estado_civil>${this.escapeXML(p.estadoCivil || '')}</estado_civil>\n`;
+    xml += `        <tipo_sangre>${this.escapeXML(p.tipoSangre || '')}</tipo_sangre>\n`;
+    xml += `      </datos_personales>\n`;
+    xml += `      <contacto>\n`;
+    xml += `        <email>${this.escapeXML(p.email || '')}</email>\n`;
+    xml += `        <telefono>${this.escapeXML(p.telefono || '')}</telefono>\n`;
+    xml += `      </contacto>\n`;
+    xml += `      <fecha_registro>${this.escapeXML(p.fechaRegistro || '')}</fecha_registro>\n`;
+    xml += `    </paciente>\n`;
+    return xml;
+  }
+  
+  // Exportar una cita a XML
+  static exportCitaXML(c) {
+    let xml = `    <cita id="${this.escapeXML(c.id)}">\n`;
+    xml += `      <paciente_cedula>${this.escapeXML(c.cedula)}</paciente_cedula>\n`;
+    xml += `      <paciente_nombre>${this.escapeXML(c.paciente)}</paciente_nombre>\n`;
+    xml += `      <medico>${this.escapeXML(c.medico)}</medico>\n`;
+    xml += `      <fecha_hora>${this.escapeXML(c.fecha)}</fecha_hora>\n`;
+    xml += `      <consultorio>${this.escapeXML(c.consultorio)}</consultorio>\n`;
+    xml += `      <estado>${this.escapeXML(c.estado)}</estado>\n`;
+    xml += `      <observaciones>${this.escapeXML(c.observaciones || '')}</observaciones>\n`;
+    xml += `    </cita>\n`;
+    return xml;
+  }
+  
+  // Exportar un médico a XML
+  static exportMedicoXML(m) {
+    let xml = `    <medico id="${this.escapeXML(m.id)}">\n`;
+    xml += `      <nombre>${this.escapeXML(m.nombre)}</nombre>\n`;
+    xml += `      <especialidad>${this.escapeXML(m.especialidad)}</especialidad>\n`;
+    xml += `      <telefono>${this.escapeXML(m.telefono || '')}</telefono>\n`;
+    xml += `      <correo>${this.escapeXML(m.correo)}</correo>\n`;
+    xml += `    </medico>\n`;
+    return xml;
+  }
+  
+  // Exportar una especialidad a XML
+  static exportEspecialidadXML(e) {
+    let xml = `    <especialidad id="${e.id}">\n`;
+    xml += `      <nombre>${this.escapeXML(e.especialidad)}</nombre>\n`;
+    xml += `      <descripcion>${this.escapeXML(e.descripcion || '')}</descripcion>\n`;
+    xml += `      <area>${this.escapeXML(e.area || '')}</area>\n`;
+    xml += `      <horario_atencion>${this.escapeXML(e.horario || '')}</horario_atencion>\n`;
+    xml += `      <medico_responsable>${this.escapeXML(e.responsable || '')}</medico_responsable>\n`;
+    xml += `    </especialidad>\n`;
+    return xml;
+  }
+  
+  // Exportar una factura a XML
+  static exportFacturaXML(f) {
+    let xml = `    <factura id="${this.escapeXML(f.numeroFactura || f.id)}">\n`;
+    xml += `      <numero_factura>${this.escapeXML(f.numeroFactura || '')}</numero_factura>\n`;
+    xml += `      <paciente>\n`;
+    xml += `        <nombre>${this.escapeXML(f.paciente || '')}</nombre>\n`;
+    xml += `        <cedula>${this.escapeXML(f.cedula || '')}</cedula>\n`;
+    xml += `      </paciente>\n`;
+    xml += `      <medico>${this.escapeXML(f.medico || '')}</medico>\n`;
+    xml += `      <servicio>${this.escapeXML(f.servicio || '')}</servicio>\n`;
+    xml += `      <costo moneda="USD">${f.costo || 0}</costo>\n`;
+    xml += `      <metodo_pago>${this.escapeXML(f.metodoPago || '')}</metodo_pago>\n`;
+    xml += `      <fecha_emision>${this.escapeXML(f.fecha || '')}</fecha_emision>\n`;
+    xml += `    </factura>\n`;
+    return xml;
+  }
+  
+  // Exportar a JSON
   static exportToJSON(data) {
+    // Si es un array simple de resultados filtrados
+    if (Array.isArray(data)) {
+      return JSON.stringify({ 
+        sistema_medico: { 
+          resultados: data,
+          total: data.length,
+          fecha_exportacion: new Date().toISOString()
+        } 
+      }, null, 2);
+    }
+    
+    // Exportación completa
     const jsonData = {
       sistema_medico: {
         pacientes: (data.pacientes || []).map(p => ({
           id: p.cedula,
-          datos_personales: {
-            nombres: p.nombres,
-            cedula: p.cedula,
-            fecha_nacimiento: p.fechaNacimiento || '',
-            edad: p.edad || 0,
-            sexo: p.sexo || '',
-            estado_civil: p.estadoCivil || '',
-            tipo_sangre: p.tipoSangre || '',
-            nacionalidad: p.nacionalidad || 'No especificado'
-          },
-          contacto: {
-            direccion: p.direccion || '',
-            ciudad: p.ciudad || '',
-            provincia: p.provincia || '',
-            telefono: p.telefono || '',
-            email: p.email || ''
-          },
-          datos_medicos: {
-            peso: { valor: p.peso || 0, unidad: 'kg' },
-            estatura: { valor: p.estatura || 0, unidad: 'm' },
-            imc: p.imc || '',
-            alergias: p.alergias || '',
-            enfermedades_cronicas: p.enfermedades || '',
-            tratamientos_actuales: p.tratamientos || ''
-          },
-          fecha_registro: p.fechaRegistro || ''
+          nombres: p.nombres,
+          cedula: p.cedula,
+          edad: p.edad,
+          sexo: p.sexo,
+          tipo_sangre: p.tipoSangre,
+          email: p.email || '',
+          fecha_registro: p.fechaRegistro
         })),
         citas: (data.citas || []).map(c => ({
           id: c.id,
-          paciente: {
-            cedula: c.cedula,
-            nombre: c.paciente
-          },
+          paciente: { cedula: c.cedula, nombre: c.paciente },
           medico: c.medico,
           fecha_hora: c.fecha,
           consultorio: c.consultorio,
           estado: c.estado,
-          observaciones: c.observaciones || '',
-          fecha_registro: c.fechaRegistro
+          observaciones: c.observaciones || ''
         })),
         medicos: (data.medicos || []).map(m => ({
           id: m.id,
           nombre: m.nombre,
           especialidad: m.especialidad,
           telefono: m.telefono || '',
-          correo: m.correo,
-          horario: m.horario,
-          fecha_registro: m.fechaRegistro
+          correo: m.correo
         })),
         especialidades: (data.especialidades || []).map(e => ({
           id: e.id,
           nombre: e.especialidad,
           descripcion: e.descripcion || '',
-          area: e.area || '',
-          horario_atencion: e.horario || '',
-          medico_responsable: e.responsable || ''
+          area: e.area || ''
         })),
         facturas: (data.facturas || []).map(f => ({
-          id: f.numeroFactura || f.id,
-          numero_factura: f.numeroFactura || '',
-          paciente: {
-            nombre: f.paciente || '',
-            cedula: f.cedula || ''
-          },
-          medico: f.medico || '',
+          numero_factura: f.numeroFactura || f.id,
+          paciente: f.paciente || '',
           servicio: f.servicio || '',
-          descripcion: f.descripcion || '',
-          costo: { valor: f.costo || 0, moneda: 'USD' },
-          metodo_pago: f.metodoPago || '',
-          fecha_emision: f.fecha || '',
-          fecha_registro: f.fechaRegistro || ''
-        }))
+          costo: f.costo || 0,
+          fecha: f.fecha || ''
+        })),
+        fecha_exportacion: new Date().toISOString()
       }
     };
     
     return JSON.stringify(jsonData, null, 2);
   }
   
-  // Descarga de archivos XML
-  static downloadXML(data, filename = 'sistema_medico.xml') {
+  // Descargar archivos
+  static downloadXML(data, filename = 'reporte.xml') {
     try {
       const xmlContent = this.exportToXML(data);
       const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8' });
@@ -220,8 +247,7 @@ static exportToXML(data) {
     }
   }
   
-  // Descarga de archivos JSON
-  static downloadJSON(data, filename = 'sistema_medico.json') {
+  static downloadJSON(data, filename = 'reporte.json') {
     try {
       const jsonContent = this.exportToJSON(data);
       const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8' });
@@ -240,7 +266,7 @@ static exportToXML(data) {
     }
   }
   
-  // Utilidades de escape y formato
+  // Utilidad para escapar caracteres XML
   static escapeXML(text) {
     if (!text) return '';
     return String(text)
@@ -250,65 +276,148 @@ static exportToXML(data) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&apos;');
   }
-  
-  static formatHorario(horario) {
-    if (!horario) return 'No especificado';
-    if (typeof horario === 'string') return horario;
-    try {
-      return JSON.stringify(horario);
-    } catch {
-      return 'No especificado';
-    }
-  }
 }
 
-// Integración con la interfaz de usuario
+// Integración con la interfaz
 document.addEventListener('DOMContentLoaded', function() {
-  // Agregar botones de exportación en páginas que los necesiten
   const botonesContainer = document.querySelector('.botones');
   
   if (botonesContainer && !document.getElementById('btnExportXML')) {
-    // Crear botón XML
+    // Detectar en qué página estamos
+    const currentPage = detectarPagina();
+    
+    // Botón XML
     const btnXML = document.createElement('button');
     btnXML.type = 'button';
     btnXML.id = 'btnExportXML';
     btnXML.className = 'btn-secondary';
     btnXML.innerHTML = 'Exportar XML';
     btnXML.onclick = function() {
-      if (typeof baseDatos !== 'undefined') {
-        const fecha = new Date().toISOString().split('T')[0];
-        const success = DataExportService.downloadXML(baseDatos, `sistema_medico_${fecha}.xml`);
-        if (success && typeof mostrarMensaje === 'function') {
-          mostrarMensaje('Datos exportados en formato XML', 'exito');
-        }
-      } else {
-        alert('No hay datos disponibles para exportar');
-      }
+      exportarDatosPagina('xml', currentPage);
     };
     
-    // Crear botón JSON
+    // Botón JSON
     const btnJSON = document.createElement('button');
     btnJSON.type = 'button';
     btnJSON.id = 'btnExportJSON';
     btnJSON.className = 'btn-secondary';
     btnJSON.innerHTML = 'Exportar JSON';
     btnJSON.onclick = function() {
-      if (typeof baseDatos !== 'undefined') {
-        const fecha = new Date().toISOString().split('T')[0];
-        const success = DataExportService.downloadJSON(baseDatos, `sistema_medico_${fecha}.json`);
-        if (success && typeof mostrarMensaje === 'function') {
-          mostrarMensaje('Datos exportados en formato JSON', 'exito');
-        }
-      } else {
-        alert('No hay datos disponibles para exportar');
-      }
+      exportarDatosPagina('json', currentPage);
     };
     
-    // Agregar botones al contenedor
     botonesContainer.appendChild(btnXML);
     botonesContainer.appendChild(btnJSON);
   }
 });
+
+// Detectar en qué página estamos
+function detectarPagina() {
+  const url = window.location.pathname;
+  
+  if (url.includes('Pacientes.html') || document.getElementById('formPacientes')) {
+    return 'pacientes';
+  } else if (url.includes('Citas.html') || document.getElementById('formCitas')) {
+    return 'citas';
+  } else if (url.includes('Medicos.html') || document.getElementById('formMedicos')) {
+    return 'medicos';
+  } else if (url.includes('Especialidades.html') || document.getElementById('formEspecialidad')) {
+    return 'especialidades';
+  } else if (url.includes('Facturacion.html') || document.getElementById('formFacturacion')) {
+    return 'facturas';
+  } else if (url.includes('Reportes.html') || document.getElementById('formReportes')) {
+    return 'reportes';
+  } else if (url.includes('PagPrincipal.html')) {
+    return 'principal';
+  }
+  
+  return 'desconocido';
+}
+
+// Exportar datos según la página actual
+function exportarDatosPagina(formato, pagina) {
+  let dataToExport = null;
+  let filename = '';
+  let mensaje = '';
+  const fecha = new Date().toISOString().split('T')[0];
+  
+  switch(pagina) {
+    case 'pacientes':
+      dataToExport = { pacientes: baseDatos.pacientes || [] };
+      filename = `pacientes_${fecha}.${formato}`;
+      mensaje = `${baseDatos.pacientes.length} paciente(s) exportado(s)`;
+      break;
+      
+    case 'citas':
+      dataToExport = { citas: baseDatos.citas || [] };
+      filename = `citas_${fecha}.${formato}`;
+      mensaje = `${baseDatos.citas.length} cita(s) exportada(s)`;
+      break;
+      
+    case 'medicos':
+      dataToExport = { medicos: baseDatos.medicos || [] };
+      filename = `medicos_${fecha}.${formato}`;
+      mensaje = `${baseDatos.medicos.length} médico(s) exportado(s)`;
+      break;
+      
+    case 'especialidades':
+      dataToExport = { especialidades: baseDatos.especialidades || [] };
+      filename = `especialidades_${fecha}.${formato}`;
+      mensaje = `${baseDatos.especialidades.length} especialidad(es) exportada(s)`;
+      break;
+      
+    case 'facturas':
+      dataToExport = { facturas: baseDatos.facturas || [] };
+      filename = `facturas_${fecha}.${formato}`;
+      mensaje = `${baseDatos.facturas.length} factura(s) exportada(s)`;
+      break;
+      
+    case 'reportes':
+      // Si hay resultados filtrados, usar esos
+      if (typeof lastReportResults !== 'undefined' && lastReportResults.length > 0) {
+        dataToExport = lastReportResults;
+        filename = `reporte_filtrado_${fecha}.${formato}`;
+        mensaje = `${lastReportResults.length} resultado(s) exportado(s)`;
+      } else {
+        // Si no hay filtros, exportar todo
+        dataToExport = baseDatos;
+        filename = `sistema_completo_${fecha}.${formato}`;
+        mensaje = 'Sistema completo exportado';
+      }
+      break;
+      
+    case 'principal':
+      // Desde página principal, exportar todo el sistema
+      dataToExport = baseDatos;
+      filename = `sistema_completo_${fecha}.${formato}`;
+      mensaje = 'Sistema completo exportado';
+      break;
+      
+    default:
+      dataToExport = baseDatos;
+      filename = `datos_${fecha}.${formato}`;
+      mensaje = 'Datos exportados';
+  }
+  
+  // Realizar la exportación
+  let success = false;
+  if (formato === 'xml') {
+    success = DataExportService.downloadXML(dataToExport, filename);
+  } else if (formato === 'json') {
+    success = DataExportService.downloadJSON(dataToExport, filename);
+  }
+  
+  // Mostrar mensaje
+  if (success && typeof mostrarMensaje === 'function') {
+    mostrarMensaje(mensaje + ` en formato ${formato.toUpperCase()}`, 'exito');
+  } else if (!success) {
+    if (typeof mostrarMensaje === 'function') {
+      mostrarMensaje('Error al exportar los datos', 'error');
+    } else {
+      alert('Error al exportar los datos');
+    }
+  }
+}
 
 // Hacer disponible globalmente
 if (typeof window !== 'undefined') {
