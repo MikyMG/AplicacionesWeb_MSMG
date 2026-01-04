@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../../css/Dashboard.css';
 import useCharts from '../../hooks/useCharts';
 
@@ -86,10 +86,7 @@ function Dashboard({ baseDatos, usuario, onNavigate, onLogout }) {
             </div>
           </section>
 
-          <section className="storage-inspector" style={{ marginTop: 20 }}>
-            <h3>Datos guardados (localStorage)</h3>
-            <StorageInspector />
-          </section>
+          
         </main>
       </div>
     </div>
@@ -97,46 +94,3 @@ function Dashboard({ baseDatos, usuario, onNavigate, onLogout }) {
 }
 
 export default Dashboard;
-
-function StorageInspector() {
-  const [visible, setVisible] = useState(false);
-  const [data, setData] = useState([]);
-
-  const toggle = () => {
-    if (!visible) {
-      const arr = [];
-      try {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          try {
-            const val = JSON.parse(localStorage.getItem(key));
-            arr.push({ key, value: val });
-          } catch (e) {
-            arr.push({ key, value: localStorage.getItem(key) });
-          }
-        }
-      } catch (err) {
-        // noop
-      }
-      setData(arr);
-    }
-    setVisible(!visible);
-  };
-
-  return (
-    <div>
-      <button onClick={toggle} className="btn">{visible ? 'Ocultar datos guardados' : 'Mostrar datos guardados'}</button>
-      {visible && (
-        <div style={{ marginTop: 12, maxHeight: 240, overflow: 'auto', background: '#fff', padding: 12, borderRadius: 6, border: '1px solid #e6e6e6' }}>
-          {data.length === 0 && <div>No hay entradas en localStorage</div>}
-          {data.map(d => (
-            <div key={d.key} style={{ marginBottom: 8 }}>
-              <strong>{d.key}:</strong>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: '6px 0' }}>{JSON.stringify(d.value, null, 2)}</pre>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
