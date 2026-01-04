@@ -1,0 +1,27 @@
+.medico-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+}
+
+.medico-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+}
+
+.especialidad-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primario) 0%, var(--primario-oscuro) 100%);
+  color: white;
+  margin-left: 10px;
+}

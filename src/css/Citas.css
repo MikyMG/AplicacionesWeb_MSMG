@@ -1,0 +1,45 @@
+.cita-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+  margin-bottom: 15px;
+}
+
+.cita-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+}
+
+.cita-estado {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cita-estado.pendiente {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.cita-estado.confirmada {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.cita-estado.atendida {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.cita-estado.cancelada {
+  background: #ffebee;
+  color: #c62828;
+}

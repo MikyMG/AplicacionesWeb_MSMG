@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Logo ULEAM placeholder">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#c10e1a"/>
+      <stop offset="1" stop-color="#e63946"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" rx="12" fill="#ffffff"/>
+  <circle cx="60" cy="60" r="40" fill="url(#g)" />
+  <text x="110" y="70" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#222">ULEAM</text>
+  <text x="110" y="95" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#444">Policlínico</text>
+</svg>

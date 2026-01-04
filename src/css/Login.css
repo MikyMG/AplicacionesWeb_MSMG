@@ -1,0 +1,159 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f4f6f9 0%, #e9ecef 100%);
+  padding: 20px;
+}
+
+.logo-uleam-login {
+  width: 200px;
+  display: block;
+  margin: 0 auto 0px;
+}
+
+.login-container form {
+  max-width: 550px;
+  width: 100%;
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  animation: fadeInUp 0.6s ease;
+}
+
+.login-container h2 {
+  color: var(--primario);
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: none;
+}
+
+.login-container h2::after {
+  display: none;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--gris-claro);
+  border-radius: 10px;
+  background: var(--gris-muy-claro);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--primario);
+  box-shadow: 0 0 0 3px rgba(193, 14, 26, 0.1);
+  background: white;
+}
+
+.login-container button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primario) 0%, var(--primario-oscuro) 100%);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(193, 14, 26, 0.3);
+}
+
+.login-container button:hover {
+  background: linear-gradient(135deg, var(--primario-claro) 0%, var(--primario) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(193, 14, 26, 0.4);
+}
+
+.login-container button:active {
+  transform: translateY(0);
+}
+
+.links {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.links a {
+  display: block;
+  color: var(--gris);
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: color 0.3s ease;
+}
+
+.links a:hover {
+  color: var(--primario);
+  text-decoration: underline;
+}
+
+/* Reset modal styles */
+.reset-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+.reset-box {
+  background: white;
+  padding: 20px 22px;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 92%;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  text-align: left;
+}
+.reset-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--primario);
+}
+.reset-box input[type="email"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--gris-claro);
+  margin-bottom: 12px;
+}
+.reset-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.reset-actions button {
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+@media (max-width: 480px) {
+  .login-container form {
+    padding: 30px 25px;
+  }
+  .logo-uleam-login {
+    width: 100px;
+    margin-bottom: 14px;
+  }
+}

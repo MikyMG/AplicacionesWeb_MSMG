@@ -1,0 +1,163 @@
+.pacientes-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9f9f9 0%, #efefef 100%);
+}
+
+.lista-pacientes {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid var(--gris-claro);
+}
+
+.lista-pacientes h3 {
+  color: var(--primario);
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.pacientes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.paciente-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+}
+
+.paciente-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+  border-color: var(--primario-claro);
+}
+
+.paciente-info h4 {
+  color: var(--primario);
+  font-size: 18px;
+  margin: 0 0 10px 0;
+}
+
+.paciente-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: var(--gris);
+}
+
+.paciente-info p strong {
+  color: var(--gris-oscuro);
+  font-weight: 600;
+}
+
+.paciente-acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-eliminar {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.btn-export {
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #333;
+}
+
+.btn-pdf {
+  background: #2f80ed;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.paciente-acciones .btn-editar {
+  background-color: #10b981 !important; /* verde por defecto (Tailwind emerald-400) */
+  color: #ffffff !important; /* texto blanco para contraste */
+  border: 1px solid #059669; /* borde verde oscuro */
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+.paciente-acciones .btn-editar:hover {
+  transform: translateY(-2px);
+  background-color: #059669 !important; /* hover más oscuro */
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.18);
+}
+.paciente-acciones .btn-editar:active {
+  transform: translateY(0);
+  background-color: #047857 !important; /* estado activo */
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.14);
+}
+
+@media (max-width: 768px) {
+  .paciente-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .paciente-acciones {
+    margin-top: 15px;
+    width: 100%;
+  }
+  
+  .paciente-acciones button {
+    flex: 1;
+  }
+}
+
+/* Etiquetas de IMC */
+.imc-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+}
+.imc-badge.bajo { background: #f97316; }        /* naranja claro */
+.imc-badge.normal { background: #10b981; }      /* verde */
+.imc-badge.sobrepeso { background: #f59e0b; }   /* amarillo-ámbar */
+.imc-badge.obesidad1 { background: #fb923c; }   /* naranja-oscuro */
+.imc-badge.obesidad2 { background: #f43f5e; }   /* rosa/rojo */
+.imc-badge.obesidad3 { background: #9f1239; }   /* rojo oscuro */
+
+/* Texto simple para categoría de IMC (mostrado junto al valor) */
+.imc-text {
+  font-weight: 700;
+  margin-left: 8px;
+  font-size: 14px;
+}
+.imc-text.bajo { color: #f97316; }
+.imc-text.normal { color: #10b981; }
+.imc-text.sobrepeso { color: #f59e0b; }
+.imc-text.obesidad1 { color: #fb923c; }
+.imc-text.obesidad2 { color: #f43f5e; }
+.imc-text.obesidad3 { color: #9f1239; }
+
