@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import CitasView from '../presentational/CitasView';
-import useForm from '../../hooks/useForm';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { CitasView } from '@components/presentational';
+import { useForm } from '@hooks';
+import { useLocalStorage } from '@hooks';
 
   // fallback localStorage para uso como página independiente
 import { validarSeleccion, fechaNoPasada } from '../../services/validators';
