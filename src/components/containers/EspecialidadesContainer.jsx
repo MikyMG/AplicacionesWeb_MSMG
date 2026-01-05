@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import EspecialidadesView from '../presentational/EspecialidadesView';
 import { validarNombre } from '../../services/validators';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ especialidad: '', descripcion: '', responsable: '' });
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
   const [editingId, setEditingId] = useState(null);
+
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => { if (typeof onActualizar === 'function') { try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch (e2) { /* noop */ } } } setStoredBaseDatos(prev => ({ ...prev, [key]: value })); };
 
   const mostrarMensaje = (texto, tipo) => {
     setMensaje({ texto, tipo });
@@ -26,12 +31,12 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
     if (String(formData.descripcion).length > 2000) { mostrarErrores(['Descripción demasiado larga']); mostrarMensaje('Descripción demasiado larga', 'error'); return; }
 
     // prevenir duplicados (excluyendo el registro en edición)
-    const existe = baseDatos.especialidades.some(ex => ex.especialidad.toLowerCase() === formData.especialidad.toLowerCase() && ex.id !== editingId);
+    const existe = (effectiveBaseDatos.especialidades || []).some(ex => ex.especialidad.toLowerCase() === formData.especialidad.toLowerCase() && ex.id !== editingId);
     if (existe) { mostrarMensaje('Especialidad ya registrada', 'error'); return; }
 
     if (editingId) {
-      const actualizado = baseDatos.especialidades.map(ex => ex.id === editingId ? { ...ex, ...formData } : ex);
-      onActualizar(actualizado);
+      const actualizado = (effectiveBaseDatos.especialidades || []).map(ex => ex.id === editingId ? { ...ex, ...formData } : ex);
+      updateStore('especialidades', actualizado);
       mostrarMensaje('Especialidad actualizada', 'exito');
       setEditingId(null);
       setFormData({ especialidad: '', descripcion: '', responsable: '' });
@@ -39,14 +44,14 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
     }
 
     const nueva = { id: Date.now().toString(), ...formData, fechaRegistro: new Date().toLocaleString() };
-    onActualizar([...baseDatos.especialidades, nueva]);
+    updateStore('especialidades', [...effectiveBaseDatos.especialidades, nueva]);
     mostrarMensaje('Especialidad registrada', 'exito');
     setFormData({ especialidad: '', descripcion: '', responsable: '' });
   };
 
   const eliminar = (id) => {
     if (window.confirm('¿Eliminar especialidad?')) {
-      onActualizar(baseDatos.especialidades.filter(e => e.id !== id));
+      updateStore('especialidades', (effectiveBaseDatos.especialidades || []).filter(e => e.id !== id));
       mostrarMensaje('Especialidad eliminada', 'info');
     }
   };
@@ -84,14 +89,14 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportEspecialidadJSON = (e) => downloadFile(JSON.stringify(e, null, 2), `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllEspecialidadesJSON = () => downloadFile(JSON.stringify(baseDatos.especialidades, null, 2), `especialidades.json`, 'application/json');
+  const exportAllEspecialidadesJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.especialidades || [], null, 2), `especialidades.json`, 'application/json');
 
   const exportEspecialidadXML = (e) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(e, 'especialidad');
     downloadFile(xml, `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.xml`, 'application/xml');
   };
   const exportAllEspecialidadesXML = () => {
-    const items = (baseDatos.especialidades || []).map(ex => toXML(ex, 'especialidad')).join('\n');
+    const items = (effectiveBaseDatos.especialidades || []).map(ex => toXML(ex, 'especialidad')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<especialidades>\n${items}\n</especialidades>`;
     downloadFile(xml, `especialidades.xml`, 'application/xml');
   };
@@ -186,7 +191,7 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
     if (logoData) { const logoBoxW = 68; const logoBoxH = 44; const logoX = 40; const logoY = 14; doc.setFillColor(255,255,255); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(logoX, logoY, logoBoxW, logoBoxH, 6, 6, 'FD'); } else { doc.rect(logoX, logoY, logoBoxW, logoBoxH, 'FD'); } try { doc.addImage(logoData, 'PNG', logoX + 6, logoY + 6, logoBoxW - 12, logoBoxH - 12); } catch (err) {} }
 
     let y = 90; const left = 40; const width = doc.internal.pageSize.getWidth() - left * 2;
-    (baseDatos.especialidades || []).forEach((ex, idx) => {
+    (effectiveBaseDatos.especialidades || []).forEach((ex, idx) => {
       // calcular líneas para descripción y altura dinámica de tarjeta
       const maxTextWidth = width - 24; // margen interno
       const titleY = y + 26;
@@ -209,14 +214,14 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
       y += h + 12;
     });
 
-    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(baseDatos.especialidades || []).length} especialidades`, left, doc.internal.pageSize.getHeight() - 40);
+    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(effectiveBaseDatos.especialidades || []).length} especialidades`, left, doc.internal.pageSize.getHeight() - 40);
 
     doc.save('especialidades.pdf');
   };
 
   return (
     <EspecialidadesView
-      especialidades={baseDatos.especialidades}
+      especialidades={effectiveBaseDatos.especialidades || []}
       formData={formData}
       onChange={onChange}
       onSubmit={handleSubmit}
