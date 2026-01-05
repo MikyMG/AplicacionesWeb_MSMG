@@ -36,7 +36,8 @@ function ResetPasswordContainer({ onVolver }) {
     if (!validarPassword(password)) { const ev = evaluarPassword(password); mostrarErrores(ev.reasons && ev.reasons.length ? ev.reasons : ['La contraseña no cumple requisitos']); mostrarMensaje('Contraseña inválida', 'error'); return; }
     if (password !== confirm) { mostrarErrores(['Las contraseñas no coinciden']); mostrarMensaje('Las contraseñas no coinciden', 'error'); return; }
 
-    const resets = JSON.parse(localStorage.getItem('passwordResets') || '[]');
+    let resets = [];
+    try { resets = JSON.parse(localStorage.getItem('passwordResets') || '[]'); } catch (err) { resets = []; }
     const foundIndex = resets.findIndex(r => r.email.toLowerCase() === email.toLowerCase() && r.token.toUpperCase() === token.toUpperCase());
     if (foundIndex === -1) {
       mostrarMensaje('Token o correo inválido', 'error');
@@ -54,13 +55,15 @@ function ResetPasswordContainer({ onVolver }) {
     }
 
     // guardar contraseña en localStorage (simulación)
-    const users = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-    users[email.toLowerCase()] = password;
-    localStorage.setItem('userPasswords', JSON.stringify(users));
+    try {
+      const users = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+      users[email.toLowerCase()] = password;
+      localStorage.setItem('userPasswords', JSON.stringify(users));
+    } catch (err) { /* noop */ }
 
     // eliminar la solicitud de reset
     resets.splice(foundIndex, 1);
-    localStorage.setItem('passwordResets', JSON.stringify(resets));
+    try { localStorage.setItem('passwordResets', JSON.stringify(resets)); } catch (err) { /* noop */ }
 
     // limpiar querystring para seguridad/UX
     try {

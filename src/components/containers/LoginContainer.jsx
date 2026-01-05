@@ -51,6 +51,16 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
 
+  // Helper seguro para parsear JSON desde localStorage
+  const safeParse = (value, fallback) => {
+    try {
+      if (!value) return fallback;
+      return JSON.parse(value);
+    } catch (err) {
+      return fallback;
+    }
+  };
+
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => {
     setShowRegister(false);
@@ -90,17 +100,17 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Guardar contraseña en localStorage (simulación)
-    const users = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    const users = safeParse(localStorage.getItem("userPasswords"), {});
     users[resetEmail.toLowerCase()] = resetPassword;
-    localStorage.setItem("userPasswords", JSON.stringify(users));
+    try { localStorage.setItem("userPasswords", JSON.stringify(users)); } catch (err) { /* noop */ }
 
     // Registrar correo conocido para evitar que sea usado por otra cuenta en el futuro
     try {
-      const known = JSON.parse(localStorage.getItem("knownEmails") || "[]");
+      const known = safeParse(localStorage.getItem("knownEmails"), []);
       const norm = resetEmail.toLowerCase();
       if (!known.some((k) => k === norm)) {
         known.push(norm);
-        localStorage.setItem("knownEmails", JSON.stringify(known));
+        try { localStorage.setItem("knownEmails", JSON.stringify(known)); } catch (err) { /* noop */ }
       }
     } catch (err) {
       // noop
@@ -144,16 +154,16 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Guardar usuario
-    const users = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    const users = safeParse(localStorage.getItem("userPasswords"), {});
     users[regEmail.toLowerCase()] = regPassword;
-    localStorage.setItem("userPasswords", JSON.stringify(users));
+    try { localStorage.setItem("userPasswords", JSON.stringify(users)); } catch (err) { /* noop */ }
 
     try {
-      const known = JSON.parse(localStorage.getItem("knownEmails") || "[]");
+      const known = safeParse(localStorage.getItem("knownEmails"), []);
       const norm = regEmail.toLowerCase();
       if (!known.some((k) => k === norm)) {
         known.push(norm);
-        localStorage.setItem("knownEmails", JSON.stringify(known));
+        try { localStorage.setItem("knownEmails", JSON.stringify(known)); } catch (err) { /* noop */ }
       }
     } catch (err) {
       /* noop */
@@ -214,7 +224,7 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Verificar credenciales contra almacenamiento simulado
-    const users = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    const users = safeParse(localStorage.getItem("userPasswords"), {});
     const normUsuario = String(formData.usuario).toLowerCase();
     const stored = users[normUsuario];
     if (!stored) {
