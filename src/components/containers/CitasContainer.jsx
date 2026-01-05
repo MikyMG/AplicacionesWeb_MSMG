@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import CitasView from '../presentational/CitasView';
 import useForm from '../../hooks/useForm';
+import useLocalStorage from '../../hooks/useLocalStorage';
+
+  // fallback localStorage para uso como página independiente
 import { validarSeleccion, fechaNoPasada } from '../../services/validators';
 
 function CitasContainer({ baseDatos, onActualizar, onVolver }) {
@@ -9,6 +12,10 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
 
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
+
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => { if (typeof onActualizar === 'function') { try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch(e2) { /* noop */ } } } setStoredBaseDatos(prev => ({ ...prev, [key]: value })); };
 
   const mostrarMensaje = (texto, tipo) => {
     setMensaje({ texto, tipo });
@@ -26,14 +33,14 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
     if (!validarSeleccion(formData.estado)) { mostrarErrores(['Seleccione un estado']); mostrarMensaje('Seleccione un estado', 'error'); return; }
     if (formData.consultorio && String(formData.consultorio).length > 150) { mostrarErrores(['Nombre de consultorio demasiado largo']); mostrarMensaje('Nombre de consultorio demasiado largo', 'error'); return; }
 
-    const paciente = baseDatos.pacientes.find(p => p.id === formData.pacienteId);
+    const paciente = (effectiveBaseDatos.pacientes || []).find(p => p.id === formData.pacienteId);
     if (!paciente) { mostrarErrores(['Paciente no encontrado']); mostrarMensaje('Paciente no encontrado', 'error'); return; }
 
     // Validar que la cédula ingresada coincide con la del paciente seleccionado (si se completó)
     if (formData.cedula && paciente.cedula && String(formData.cedula).trim() !== String(paciente.cedula).trim()) { mostrarErrores(['La cédula no coincide con el paciente seleccionado']); mostrarMensaje('La cédula no coincide con el paciente seleccionado', 'error'); return; }
 
     // impedir citas duplicadas exactas para el mismo médico y fecha/hora
-    const conflicto = (baseDatos.citas || []).some(c => c.medico === formData.medicoNombre && c.fecha === formData.fecha && c.id !== editingId);
+    const conflicto = (effectiveBaseDatos.citas || []).some(c => c.medico === formData.medicoNombre && c.fecha === formData.fecha && c.id !== editingId);
     if (conflicto) { mostrarErrores(['Ya existe una cita para este médico en la misma fecha y hora']); mostrarMensaje('Ya existe una cita para este médico en la misma fecha y hora', 'error'); return; }
 
     const nuevaCita = {
@@ -51,22 +58,22 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
     };
 
     if (editingId) {
-      const actualizado = baseDatos.citas.map(c => c.id === editingId ? { ...c, ...nuevaCita, id: editingId } : c);
-      onActualizar(actualizado);
+      const actualizado = (effectiveBaseDatos.citas || []).map(c => c.id === editingId ? { ...c, ...nuevaCita, id: editingId } : c);
+      updateStore('citas', actualizado);
       mostrarMensaje('Cita actualizada', 'exito');
       setEditingId(null);
       reset();
       return;
     }
 
-    onActualizar([...baseDatos.citas, nuevaCita]);
+    updateStore('citas', [...effectiveBaseDatos.citas, nuevaCita]);
     mostrarMensaje('Cita registrada exitosamente', 'exito');
     reset();
   };
 
   const eliminarCita = (id) => {
     if (window.confirm('¿Está seguro que desea eliminar esta cita?')) {
-      onActualizar(baseDatos.citas.filter(c => c.id !== id));
+      updateStore('citas', (effectiveBaseDatos.citas || []).filter(c => c.id !== id));
       mostrarMensaje('Cita eliminada', 'info');
     }
   };
@@ -74,7 +81,7 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
   const onChange = (field, value) => {
     if (field === 'pacienteId') {
       handleChange('pacienteId', value);
-      const paciente = baseDatos.pacientes.find(p => p.id === value);
+      const paciente = (effectiveBaseDatos.pacientes || []).find(p => p.id === value);
       handleChange('cedula', paciente ? paciente.cedula : '');
       return;
     }
@@ -120,14 +127,14 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportCitaJSON = (c) => downloadFile(JSON.stringify(c, null, 2), `${(c.paciente || 'cita').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllCitasJSON = () => downloadFile(JSON.stringify(baseDatos.citas, null, 2), `citas.json`, 'application/json');
+  const exportAllCitasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.citas || [], null, 2), `citas.json`, 'application/json');
 
   const exportCitaXML = (c) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(c, 'cita');
     downloadFile(xml, `${(c.paciente || 'cita').replace(/\s+/g, '_')}.xml`, 'application/xml');
   };
   const exportAllCitasXML = () => {
-    const items = (baseDatos.citas || []).map(c => toXML(c, 'cita')).join('\n');
+    const items = (effectiveBaseDatos.citas || []).map(c => toXML(c, 'cita')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<citas>\n${items}\n</citas>`;
     downloadFile(xml, `citas.xml`, 'application/xml');
   };
@@ -284,7 +291,7 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
 
     let y = 90; const left = 40; const width = doc.internal.pageSize.getWidth() - left * 2;
 
-    (baseDatos.citas || []).forEach((c, idx) => {
+    (effectiveBaseDatos.citas || []).forEach((c, idx) => {
       if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 90; }
       const h = 72; doc.setFillColor(...cajaBg); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(left, y, width, h, 6, 6, 'FD'); } else { doc.rect(left, y, width, h, 'FD'); }
       doc.setFont('helvetica', 'bold'); doc.setTextColor(193,14,26); doc.setFontSize(12); doc.text(`${idx + 1}. ${c.paciente || '—'}`, left + 12, y + 26);
@@ -292,16 +299,16 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
       y += h + 12; }
     );
 
-    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(baseDatos.citas || []).length} citas`, left, doc.internal.pageSize.getHeight() - 40);
+    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(effectiveBaseDatos.citas || []).length} citas`, left, doc.internal.pageSize.getHeight() - 40);
 
     doc.save('citas.pdf');
   };
 
   return (
     <CitasView
-      pacientes={baseDatos.pacientes}
-      medicos={baseDatos.medicos}
-      citas={baseDatos.citas}
+      pacientes={effectiveBaseDatos.pacientes || []}
+      medicos={effectiveBaseDatos.medicos || []}
+      citas={effectiveBaseDatos.citas || []}
       formData={formData}
       onChange={onChange}
       onSubmit={handleSubmit}
