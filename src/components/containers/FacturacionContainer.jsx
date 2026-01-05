@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import FacturacionView from '../presentational/FacturacionView';
 import { validarNumeroRango, validarSeleccion, validarFechaISO } from '../../services/validators';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => { if (typeof onActualizar === 'function') { try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch(e2) {} } } setStoredBaseDatos(prev => ({ ...prev, [key]: value })); };
   const [formData, setFormData] = useState({ pacienteId: '', medico: '', servicio: '', costo: '', metodoPago: '', fecha: '' });
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
@@ -34,7 +38,7 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
       if (d > hoy) { mostrarErrores(['La fecha de la factura no puede ser futura']); mostrarMensaje('La fecha de la factura no puede ser futura', 'error'); return; }
     }
 
-    const paciente = baseDatos.pacientes.find(p => p.id === formData.pacienteId);
+    const paciente = (effectiveBaseDatos.pacientes || []).find(p => p.id === formData.pacienteId);
 
     const nueva = {
       id: Date.now().toString(),
@@ -50,15 +54,15 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
     };
 
     if (editingId) {
-      const actualizado = baseDatos.facturas.map(f => f.id === editingId ? { ...f, ...nueva, id: editingId } : f);
-      onActualizar(actualizado);
+      const actualizado = (effectiveBaseDatos.facturas || []).map(f => f.id === editingId ? { ...f, ...nueva, id: editingId } : f);
+      updateStore('facturas', actualizado);
       mostrarMensaje('Factura actualizada', 'exito');
       setEditingId(null);
       setFormData({ pacienteId: '', medico: '', servicio: '', costo: '', metodoPago: '', fecha: '' });
       return;
     }
 
-    onActualizar([...baseDatos.facturas, nueva]);
+    updateStore('facturas', [...effectiveBaseDatos.facturas, nueva]);
     mostrarMensaje('Factura generada exitosamente', 'exito');
     setFormData({ pacienteId: '', medico: '', servicio: '', costo: '', metodoPago: '', fecha: '' });
   };
@@ -87,14 +91,14 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportFacturaJSON = (f) => downloadFile(JSON.stringify(f, null, 2), `${(f.numeroFactura || 'factura').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllFacturasJSON = () => downloadFile(JSON.stringify(baseDatos.facturas, null, 2), `facturas.json`, 'application/json');
+  const exportAllFacturasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.facturas || [], null, 2), `facturas.json`, 'application/json');
 
   const exportFacturaXML = (f) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(f, 'factura');
     downloadFile(xml, `${(f.numeroFactura || 'factura').replace(/\s+/g, '_')}.xml`, 'application/xml');
   };
   const exportAllFacturasXML = () => {
-    const items = (baseDatos.facturas || []).map(f => toXML(f, 'factura')).join('\n');
+    const items = (effectiveBaseDatos.facturas || []).map(f => toXML(f, 'factura')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<facturas>\n${items}\n</facturas>`;
     downloadFile(xml, `facturas.xml`, 'application/xml');
   };
@@ -233,18 +237,18 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
       try { doc.addImage(logoData, 'PNG', logoX + 6, logoY + 6, logoBoxW - 12, logoBoxH - 12); } catch (err) {}
     }
 
-    let y = 90; const left = 40; const width = doc.internal.pageSize.getWidth() - left * 2; (baseDatos.facturas || []).forEach((f, idx) => { if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 90; } const h = 72; doc.setFillColor(...cajaBg); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(left, y, width, h, 6, 6, 'FD'); } else { doc.rect(left, y, width, h, 'FD'); } doc.setFont('helvetica', 'bold'); doc.setTextColor(193,14,26); doc.setFontSize(12); doc.text(`${idx + 1}. ${f.numeroFactura || '—'}`, left + 12, y + 26); doc.setFont('helvetica','normal'); doc.setTextColor(0,0,0); doc.setFontSize(10); const line1 = `${f.paciente || ''} • ${f.cedula || ''} • ${f.costo != null ? '$' + f.costo.toFixed(2) : ''}`.replace(/\s+•\s+$/,''); doc.text(line1, left + 12, y + 46); y += h + 12; });
+    let y = 90; const left = 40; const width = doc.internal.pageSize.getWidth() - left * 2; (effectiveBaseDatos.facturas || []).forEach((f, idx) => { if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 90; } const h = 72; doc.setFillColor(...cajaBg); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(left, y, width, h, 6, 6, 'FD'); } else { doc.rect(left, y, width, h, 'FD'); } doc.setFont('helvetica', 'bold'); doc.setTextColor(193,14,26); doc.setFontSize(12); doc.text(`${idx + 1}. ${f.numeroFactura || '—'}`, left + 12, y + 26); doc.setFont('helvetica','normal'); doc.setTextColor(0,0,0); doc.setFontSize(10); const line1 = `${f.paciente || ''} • ${f.cedula || ''} • ${f.costo != null ? '$' + f.costo.toFixed(2) : ''}`.replace(/\s+•\s+$/,''); doc.text(line1, left + 12, y + 46); y += h + 12; });
 
-    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(baseDatos.facturas || []).length} facturas`, left, doc.internal.pageSize.getHeight() - 40);
+    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(effectiveBaseDatos.facturas || []).length} facturas`, left, doc.internal.pageSize.getHeight() - 40);
 
     doc.save('facturas.pdf');
   };
 
   return (
     <FacturacionView
-      pacientes={baseDatos.pacientes}
-      medicos={baseDatos.medicos}
-      facturas={baseDatos.facturas}
+      pacientes={effectiveBaseDatos.pacientes || []}
+      medicos={effectiveBaseDatos.medicos || []}
+      facturas={effectiveBaseDatos.facturas || []}
       formData={formData}
       onChange={(f, v) => setFormData(prev => ({ ...prev, [f]: v }))}
       onSubmit={handleSubmit}
