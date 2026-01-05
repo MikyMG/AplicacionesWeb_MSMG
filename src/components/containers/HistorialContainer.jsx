@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { HistorialView } from '@components/presentational';
 import { validarNumeroRango, fechaNoPasada, validarFechaISO } from '@services';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportXML, ensureJsPDF, getDataUrlFromUrl } from '@utils/exporters';
 
 function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
   const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('baseDatos', null);

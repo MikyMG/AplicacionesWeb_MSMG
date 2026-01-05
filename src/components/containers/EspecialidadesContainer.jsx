@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { EspecialidadesView } from '@components/presentational';
 import { validarNombre } from '@services';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportAllJSON, exportXML, exportAllXML, ensureJsPDF, getDataUrlFromUrl } from '@utils/exporters';
 
 function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ especialidad: '', descripcion: '', responsable: '' });

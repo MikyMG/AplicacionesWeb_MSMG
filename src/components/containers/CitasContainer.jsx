@@ -103,65 +103,12 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
     setValues({ pacienteId: cita.pacienteId || '', cedula: cita.cedula || '', especialidad: cita.especialidad || '', medicoNombre: cita.medico || '', fecha: cita.fecha || '', consultorio: cita.consultorio || '', estado: cita.estado || '', observaciones: cita.observaciones || '' });
   };
 
-  // helpers de descarga
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'cita') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
-
+  // helpers de descarga centralizados en `@utils/exporters` (downloadFile, toXML, ensureJsPDF, getDataUrlFromUrl)
   const exportCitaJSON = (c) => downloadFile(JSON.stringify(c, null, 2), `${(c.paciente || 'cita').replace(/\s+/g, '_')}.json`, 'application/json');
   const exportAllCitasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.citas || [], null, 2), `citas.json`, 'application/json');
 
-  const exportCitaXML = (c) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(c, 'cita');
-    downloadFile(xml, `${(c.paciente || 'cita').replace(/\s+/g, '_')}.xml`, 'application/xml');
-  };
-  const exportAllCitasXML = () => {
-    const items = (effectiveBaseDatos.citas || []).map(c => toXML(c, 'cita')).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<citas>\n${items}\n</citas>`;
-    downloadFile(xml, `citas.xml`, 'application/xml');
-  };
-
-  const ensureJsPDF = () => new Promise((resolve) => {
-    const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;
-    if (existing) { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); return; }
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    script.onload = () => { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); };
-    document.body.appendChild(script);
-  });
-
-  const getDataUrlFromUrl = async (url) => {
-    try {
-      const res = await fetch(url);
-      const blob = await res.blob();
-      return await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    } catch (err) {
-      return null;
-    }
-  };
+  const exportCitaXML = (c) => exportXML(c, 'cita', `${(c.paciente || 'cita').replace(/\s+/g, '_')}.xml`);
+  const exportAllCitasXML = () => exportAllXML(effectiveBaseDatos.citas || [], 'cita', `citas.xml`);
 
   const exportCitaPDF = async (c) => {
     const jsPDF = await ensureJsPDF();

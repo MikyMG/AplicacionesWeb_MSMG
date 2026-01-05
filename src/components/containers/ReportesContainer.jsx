@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ReportesView } from '@components/presentational';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportXML, ensureJsPDF, getDataUrlFromUrl } from '@utils/exporters';
 
 function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
   const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
@@ -60,27 +61,9 @@ function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
   };
 
   // helpers de descarga (JSON / XML / PDF)
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'item') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportItemJSON = (item) => exportJSON(item, `${(item.nombres || item.paciente || item.nombre || item.id || 'item').toString().replace(/\s+/g, '_')}.json`);
+  const exportItemXML = (item) => exportXML(item, (item.tipo || 'item').toLowerCase(), `${(item.nombres || item.paciente || item.nombre || item.id || 'item').toString().replace(/\s+/g, '_')}.xml`);
 
   const ensureJsPDF = () => new Promise((resolve) => {
     const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;

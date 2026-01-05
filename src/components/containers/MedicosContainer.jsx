@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MedicosView } from '@components/presentational';
 import { validarEmail, validarTelefonoEstricto, validarNombre, validarSeleccion, isEmailInUse } from '@services';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportAllJSON, exportXML, exportAllXML, ensureJsPDF, getDataUrlFromUrl } from '@utils/exporters';
 
 function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ nombre: '', especialidad: '', telefono: '', correo: '' });

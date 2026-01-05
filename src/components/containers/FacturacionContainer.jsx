@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FacturacionView } from '@components/presentational';
 import { validarNumeroRango, validarSeleccion, validarFechaISO } from '@services';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportXML, exportAllJSON, exportAllXML } from '@utils/exporters';
 
 function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
   const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
@@ -68,27 +69,11 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   // helpers de descarga
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'factura') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportFacturaJSON = (f) => exportJSON(f, `${(f.nombres || f.id || 'factura').toString().replace(/\s+/g, '_')}.json`);
+  const exportFacturaXML = (f) => exportXML(f, 'factura', `${(f.nombres || f.id || 'factura').toString().replace(/\s+/g, '_')}.xml`);
+  const exportAllFacturasJSON = () => exportAllJSON(effectiveBaseDatos.facturas || [], 'facturas.json');
+  const exportAllFacturasXML = () => exportAllXML(effectiveBaseDatos.facturas || [], 'factura', 'facturas.xml');
 
   const exportFacturaJSON = (f) => downloadFile(JSON.stringify(f, null, 2), `${(f.numeroFactura || 'factura').replace(/\s+/g, '_')}.json`, 'application/json');
   const exportAllFacturasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.facturas || [], null, 2), `facturas.json`, 'application/json');

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PacientesView } from '@components/presentational';
 import { validarCedula, validarEmail, validarTelefonoEstricto, validarNombre, validarFechaNacimientoPasada, validarNumeroRango, isEmailInUse } from '@services';
 import { useForm, useLocalStorage } from '@hooks';
+import { exportJSON, exportAllJSON, exportXML, exportAllXML } from '@utils/exporters';
 
   // fallback localStorage para usar el container como página independiente
 
