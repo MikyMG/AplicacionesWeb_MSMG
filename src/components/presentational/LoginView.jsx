@@ -6,6 +6,8 @@ function LoginView({ formData, onChange, onSubmit, mensaje, errores = [], onOpen
   const __props = arguments[0] || {};
   const onOpenRegister = __props.onOpenRegister;
   const showRegister = __props.showRegister;
+  const safeMensaje = mensaje || { texto: '', tipo: '' };
+  const safeFormData = formData || { rol: '', usuario: '', contrasena: '' };
   const regRol = __props.regRol;
   const regEmail = __props.regEmail;
   const regPassword = __props.regPassword;
@@ -19,9 +21,9 @@ function LoginView({ formData, onChange, onSubmit, mensaje, errores = [], onOpen
 
   return (
     <div className="login-container">
-      {mensaje.texto && (
-        <div className={`mensaje-validacion mostrar ${mensaje.tipo}`}>
-          <span className="mensaje-texto">{mensaje.texto}</span>
+      {safeMensaje.texto && (
+        <div className={`mensaje-validacion mostrar ${safeMensaje.tipo}`}>
+          <span className="mensaje-texto">{safeMensaje.texto}</span>
         </div>
       )}
       {Array.isArray(errores) && errores.length > 0 && (
@@ -39,7 +41,7 @@ function LoginView({ formData, onChange, onSubmit, mensaje, errores = [], onOpen
         <div className="input-group">
           <select 
             name="rol" 
-            value={formData.rol}
+            value={safeFormData.rol}
             onChange={onChange}
             required
           >
@@ -54,15 +56,15 @@ function LoginView({ formData, onChange, onSubmit, mensaje, errores = [], onOpen
           <input 
             type="text" 
             name="usuario"
-            value={formData.usuario}
+            value={safeFormData.usuario}
             onChange={onChange}
             placeholder="Usuario o Correo Electrónico"
           />
-          {formData.rol && (
+          {safeFormData.rol && (
             <small style={{ display: 'block', marginTop: 6, color: 'var(--gris)' }}>
-              {formData.rol === 'admin' && 'El correo debe terminar en @adm.uleam.edu.ec'}
-              {formData.rol === 'medico' && 'El correo debe terminar en @med.uleam.edu.ec'}
-              {formData.rol === 'enfermera' && 'El correo debe terminar en @enf.uleam.edu.ec'}
+              {safeFormData.rol === 'admin' && 'El correo debe terminar en @adm.uleam.edu.ec'}
+              {safeFormData.rol === 'medico' && 'El correo debe terminar en @med.uleam.edu.ec'}
+              {safeFormData.rol === 'enfermera' && 'El correo debe terminar en @enf.uleam.edu.ec'}
             </small>
           )}
         </div>
@@ -71,7 +73,7 @@ function LoginView({ formData, onChange, onSubmit, mensaje, errores = [], onOpen
           <input 
             type="password" 
             name="contrasena"
-            value={formData.contrasena}
+            value={safeFormData.contrasena}
             onChange={onChange}
             placeholder="Contraseña"
           />
