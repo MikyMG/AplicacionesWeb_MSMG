@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import ReportesView from '../presentational/ReportesView';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => { if (typeof onActualizar === 'function') { try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch(e2) { /* noop */ } } } setStoredBaseDatos(prev => ({ ...prev, [key]: value })); };
   const [filtros, setFiltros] = useState({ pacienteId: '', fechaInicio: '', fechaFin: '' });
   const [resultados, setResultados] = useState([]);
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
@@ -17,18 +21,18 @@ function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
   const filtrar = () => {
     let datos = [];
     if (filtros.pacienteId) {
-      const paciente = baseDatos.pacientes.find(p => p.id === filtros.pacienteId);
+      const paciente = (effectiveBaseDatos.pacientes || []).find(p => p.id === filtros.pacienteId);
       if (paciente) {
         datos.push({ tipo: 'Paciente', ...paciente });
-        datos = datos.concat(baseDatos.citas.filter(c => c.cedula === paciente.cedula).map(c => ({ tipo: 'Cita', ...c })));
-        datos = datos.concat(baseDatos.facturas.filter(f => f.cedula === paciente.cedula).map(f => ({ tipo: 'Factura', ...f })));
+        datos = datos.concat((effectiveBaseDatos.citas || []).filter(c => c.cedula === paciente.cedula).map(c => ({ tipo: 'Cita', ...c })));
+        datos = datos.concat((effectiveBaseDatos.facturas || []).filter(f => f.cedula === paciente.cedula).map(f => ({ tipo: 'Factura', ...f })));
       }
     } else {
       datos = [
-        ...baseDatos.pacientes.map(p => ({ tipo: 'Paciente', ...p })),
-        ...baseDatos.citas.map(c => ({ tipo: 'Cita', ...c })),
-        ...baseDatos.medicos.map(m => ({ tipo: 'Médico', ...m })),
-        ...baseDatos.facturas.map(f => ({ tipo: 'Factura', ...f }))
+        ...(effectiveBaseDatos.pacientes || []).map(p => ({ tipo: 'Paciente', ...p })),
+        ...(effectiveBaseDatos.citas || []).map(c => ({ tipo: 'Cita', ...c })),
+        ...(effectiveBaseDatos.medicos || []).map(m => ({ tipo: 'Médico', ...m })),
+        ...(effectiveBaseDatos.facturas || []).map(f => ({ tipo: 'Factura', ...f }))
       ];
     }
 
@@ -222,36 +226,36 @@ function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
     if (!tipo || !registro || !registro.id) return;
     const t = tipo.toLowerCase();
     if (t === 'paciente' || t === 'pacientes') {
-      const actualizado = (baseDatos.pacientes || []).map(p => p.id === registro.id ? { ...p, ...registro } : p);
-      onActualizar('pacientes', actualizado);
+      const actualizado = (effectiveBaseDatos.pacientes || []).map(p => p.id === registro.id ? { ...p, ...registro } : p);
+      updateStore('pacientes', actualizado);
       mostrarMensaje('Paciente actualizado desde reportes', 'exito');
       filtrar();
       return;
     }
     if (t === 'cita' || t === 'citas') {
-      const actualizado = (baseDatos.citas || []).map(c => c.id === registro.id ? { ...c, ...registro } : c);
-      onActualizar('citas', actualizado);
+      const actualizado = (effectiveBaseDatos.citas || []).map(c => c.id === registro.id ? { ...c, ...registro } : c);
+      updateStore('citas', actualizado);
       mostrarMensaje('Cita actualizada desde reportes', 'exito');
       filtrar();
       return;
     }
     if (t === 'medico' || t === 'médico' || t === 'medicos') {
-      const actualizado = (baseDatos.medicos || []).map(m => m.id === registro.id ? { ...m, ...registro } : m);
-      onActualizar('medicos', actualizado);
+      const actualizado = (effectiveBaseDatos.medicos || []).map(m => m.id === registro.id ? { ...m, ...registro } : m);
+      updateStore('medicos', actualizado);
       mostrarMensaje('Médico actualizado desde reportes', 'exito');
       filtrar();
       return;
     }
     if (t === 'factura' || t === 'facturas') {
-      const actualizado = (baseDatos.facturas || []).map(f => f.id === registro.id ? { ...f, ...registro } : f);
-      onActualizar('facturas', actualizado);
+      const actualizado = (effectiveBaseDatos.facturas || []).map(f => f.id === registro.id ? { ...f, ...registro } : f);
+      updateStore('facturas', actualizado);
       mostrarMensaje('Factura actualizada desde reportes', 'exito');
       filtrar();
       return;
     }
     if (t === 'especialidad' || t === 'especialidades') {
-      const actualizado = (baseDatos.especialidades || []).map(e => e.id === registro.id ? { ...e, ...registro } : e);
-      onActualizar('especialidades', actualizado);
+      const actualizado = (effectiveBaseDatos.especialidades || []).map(e => e.id === registro.id ? { ...e, ...registro } : e);
+      updateStore('especialidades', actualizado);
       mostrarMensaje('Especialidad actualizada desde reportes', 'exito');
       filtrar();
       return;
@@ -260,7 +264,7 @@ function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
 
   return (
     <ReportesView
-      pacientes={baseDatos.pacientes}
+      pacientes={effectiveBaseDatos.pacientes || []}
       filtros={filtros}
       onChange={(f, v) => setFiltros(prev => ({ ...prev, [f]: v }))}
       onSubmit={(e) => { e.preventDefault(); filtrar(); }}
