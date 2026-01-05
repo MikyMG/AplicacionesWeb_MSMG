@@ -1,9 +1,12 @@
 import React from 'react';
 import '../../css/Dashboard.css';
 import useCharts from '../../hooks/useCharts';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function Dashboard({ baseDatos, usuario, onNavigate, onLogout }) {
-  const { barChartRef, pieChartRef } = useCharts(baseDatos);
+  const [storedBaseDatos] = useLocalStorage('baseDatos', null);
+  const effectiveBaseDatos = baseDatos || storedBaseDatos || { pacientes: [], medicos: [], citas: [], especialidades: [], facturas: [], historias: [] };
+  const { barChartRef, pieChartRef } = useCharts(effectiveBaseDatos);
 
 
   const getSaludo = () => {
@@ -53,24 +56,24 @@ function Dashboard({ baseDatos, usuario, onNavigate, onLogout }) {
 
         <main className="content">
           <h1>
-            {getSaludo()} <span style={{ color: '#c10e1a' }}>{usuario.rol}</span>
+            {getSaludo()} <span style={{ color: '#c10e1a' }}>{(usuario && usuario.rol) || ''}</span>
           </h1>
 
           <div className="cards">
             <div className="card">
-              <h3>{baseDatos.pacientes.length}</h3>
+              <h3>{(effectiveBaseDatos.pacientes || []).length}</h3>
               <p>Pacientes</p>
             </div>
             <div className="card">
-              <h3>{baseDatos.medicos.length}</h3>
+              <h3>{(effectiveBaseDatos.medicos || []).length}</h3>
               <p>Médicos</p>
             </div>
             <div className="card">
-              <h3>{baseDatos.citas.length}</h3>
+              <h3>{(effectiveBaseDatos.citas || []).length}</h3>
               <p>Citas</p>
             </div>
             <div className="card">
-              <h3>{baseDatos.especialidades.length}</h3>
+              <h3>{(effectiveBaseDatos.especialidades || []).length}</h3>
               <p>Especialidades</p>
             </div>
           </div>

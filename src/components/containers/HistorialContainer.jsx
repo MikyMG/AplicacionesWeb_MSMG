@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import HistorialView from '../presentational/HistorialView';
 import { validarNumeroRango, fechaNoPasada, validarFechaISO } from '../../services/validators';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('baseDatos', null);
+  const effectiveBaseDatos = baseDatos || storedBaseDatos || { pacientes: [], medicos: [], citas: [], facturas: [], historias: [] };
+  const updateStore = (key, value) => {
+    if (typeof onActualizar === 'function') {
+      onActualizar(key, value);
+    } else {
+      const next = { ...(effectiveBaseDatos || {}), [key]: value };
+      setStoredBaseDatos(next);
+    }
+  };
+
   const [pacienteId, setPacienteId] = useState('');
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState(null);
   const [historiasPaciente, setHistoriasPaciente] = useState([]);
@@ -36,14 +48,14 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
   });
 
   useEffect(() => {
-    const p = baseDatos.pacientes.find(p => p.id === pacienteId) || null;
+    const p = (effectiveBaseDatos.pacientes || []).find(p => p.id === pacienteId) || null;
     setPacienteSeleccionado(p);
-    const hs = (baseDatos.historias || []).filter(h => h.pacienteId === pacienteId);
+    const hs = (effectiveBaseDatos.historias || []).filter(h => h.pacienteId === pacienteId);
     setHistoriasPaciente(hs);
 
     // auto-llenar ultima fecha de consulta con la fecha más reciente de citas si existe
     if (p) {
-      const citasPaciente = (baseDatos.citas || []).filter(c => c.cedula === p.cedula);
+      const citasPaciente = (effectiveBaseDatos.citas || []).filter(c => c.cedula === p.cedula);
       if (citasPaciente.length > 0) {
         const last = citasPaciente.reduce((a, b) => new Date(a.fecha) > new Date(b.fecha) ? a : b);
         setForm(prev => ({ ...prev, pacienteId: p.id, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0, 10) : '' }));
@@ -53,7 +65,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     } else {
       setForm(prev => ({ ...prev, pacienteId: '', ultimaFechaConsulta: '' }));
     }
-  }, [pacienteId, baseDatos]);
+  }, [pacienteId, baseDatos, storedBaseDatos]);
 
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
@@ -96,7 +108,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     if (form.frecuenciaRespiratoria && !validarNumeroRango(form.frecuenciaRespiratoria, 5, 60)) { mostrarErrores(['Frecuencia respiratoria fuera de rango plausible']); mostrarMensaje('Frecuencia respiratoria fuera de rango plausible', 'error'); return; }
     if (form.proximaCita && (!validarFechaISO(form.proximaCita) || !fechaNoPasada(form.proximaCita))) { mostrarErrores(['Próxima cita inválida o en el pasado']); mostrarMensaje('Próxima cita inválida o en el pasado', 'error'); return; }
 
-    const paciente = baseDatos.pacientes.find(p => p.id === form.pacienteId);
+    const paciente = (effectiveBaseDatos.pacientes || []).find(p => p.id === form.pacienteId);
     const nueva = {
       id: Date.now().toString(36),
       pacienteId: form.pacienteId,
@@ -128,8 +140,8 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
       observacionesAdicionales: form.observacionesAdicionales
     };
 
-    const updated = [...(baseDatos.historias || []), nueva];
-    onActualizar('historias', updated);
+    const updated = [...(effectiveBaseDatos.historias || []), nueva];
+    updateStore('historias', updated);
     setHistoriasPaciente(updated.filter(h => h.pacienteId === form.pacienteId));
     // limpiar formulario excepto paciente y ultimaFecha
     setForm(prev => ({ ...prev, motivoConsulta: '', antecedentesMedicos: '', antecedentesPersonales: '', antecedentesFamiliares: '', habitos: '', peso: '', estatura: '', presionArterial: '', frecuenciaCardiaca: '', frecuenciaRespiratoria: '', temperatura: '', saturacionOxigeno: '', imc: '', observacionesFisicas: '', diagnosticoPrincipal: '', diagnosticoSecundario: '', tratamiento: '', recomendaciones: '', examenesSolicitados: '', proximaCita: '', observacionesAdicionales: '' }));
@@ -241,9 +253,9 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
   const onCancelarEdicion = () => {
     setEditingId(null);
     // restaurar ultima fecha segun citas
-    const p = baseDatos.pacientes.find(p => p.id === pacienteId) || null;
+    const p = (effectiveBaseDatos.pacientes || []).find(p => p.id === pacienteId) || null;
     if (p) {
-      const citasPaciente = (baseDatos.citas || []).filter(c => c.cedula === p.cedula);
+      const citasPaciente = (effectiveBaseDatos.citas || []).filter(c => c.cedula === p.cedula);
       if (citasPaciente.length > 0) {
         const last = citasPaciente.reduce((a, b) => new Date(a.fecha) > new Date(b.fecha) ? a : b);
         setForm(prev => ({ ...prev, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0, 10) : '' }));
@@ -261,7 +273,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     if (form.frecuenciaRespiratoria && !validarNumeroRango(form.frecuenciaRespiratoria, 5, 60)) { mostrarErrores(['Frecuencia respiratoria fuera de rango plausible']); mostrarMensaje('Frecuencia respiratoria fuera de rango plausible', 'error'); return; }
     if (form.proximaCita && (!validarFechaISO(form.proximaCita) || !fechaNoPasada(form.proximaCita))) { mostrarErrores(['Próxima cita inválida o en el pasado']); mostrarMensaje('Próxima cita inválida o en el pasado', 'error'); return; }
 
-    const updatedList = (baseDatos.historias || []).map(h => h.id === editingId ? {
+    const updatedList = (effectiveBaseDatos.historias || []).map(h => h.id === editingId ? {
       ...h,
       ultimaFechaConsulta: form.ultimaFechaConsulta,
       medico: form.medico,
@@ -289,7 +301,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
       observacionesAdicionales: form.observacionesAdicionales
     } : h);
 
-    onActualizar('historias', updatedList);
+    updateStore('historias', updatedList);
     setHistoriasPaciente(updatedList.filter(h => h.pacienteId === form.pacienteId));
     setEditingId(null);
     mostrarMensaje('Historia actualizada', 'exito');
@@ -297,19 +309,19 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
 
   const onEliminarHistoria = (id) => {
     if (!window.confirm('¿Eliminar esta historia?')) return;
-    const updated = (baseDatos.historias || []).filter(h => h.id !== id);
-    onActualizar('historias', updated);
+    const updated = (effectiveBaseDatos.historias || []).filter(h => h.id !== id);
+    updateStore('historias', updated);
     setHistoriasPaciente(updated.filter(h => h.pacienteId === pacienteId));
   };
 
   return (
     <HistorialView
-      pacientes={baseDatos.pacientes}
+      pacientes={effectiveBaseDatos.pacientes}
       pacienteId={pacienteId}
       pacienteSeleccionado={pacienteSeleccionado}
       onSelectPaciente={seleccionarPaciente}
-      citas={baseDatos.citas}
-      facturas={baseDatos.facturas}
+      citas={effectiveBaseDatos.citas}
+      facturas={effectiveBaseDatos.facturas}
       historias={historiasPaciente}
       form={form}
       onFormChange={handleChange}
