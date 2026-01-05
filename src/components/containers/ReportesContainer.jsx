@@ -90,12 +90,7 @@ function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
     }
   };
 
-  const exportItemJSON = (item) => downloadFile(JSON.stringify(item, null, 2), `${(item.nombres || item.paciente || item.nombre || item.id || 'item').toString().replace(/\s+/g, '_')}.json`, 'application/json');
 
-  const exportItemXML = (item) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(item, (item.tipo || 'item').toLowerCase());
-    downloadFile(xml, `${(item.nombres || item.paciente || item.nombre || item.id || 'item').toString().replace(/\s+/g, '_')}.xml`, 'application/xml');
-  };
 
   const exportItemPDF = async (item) => {
     const jsPDF = await ensureJsPDF();

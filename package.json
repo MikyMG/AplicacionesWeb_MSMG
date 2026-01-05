@@ -27,6 +27,17 @@
     "deploy": "gh-pages -d build",
     "deploy:netlify": "npm run build:astro && echo 'Built for Netlify in /dist'"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^@components/(.*)$": "<rootDir>/src/components/$1",
+      "^@components$": "<rootDir>/src/components/index.js",
+      "^@hooks/(.*)$": "<rootDir>/src/hooks/$1",
+      "^@hooks$": "<rootDir>/src/hooks/index.js",
+      "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+      "^@services/(.*)$": "<rootDir>/src/services/$1",
+      "^@services$": "<rootDir>/src/services/index.js"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",

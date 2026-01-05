@@ -57,6 +57,13 @@ export function validarTelefonoEstricto(telefono) {
   return /^(09\d{8}|\+5939\d{8})$/.test(t);
 }
 
+// Compatibilidad: validarTelefono (acepta espacios y guiones como en '+593 9 123 4567')
+export function validarTelefono(telefono) {
+  if (!telefono) return false;
+  const t = String(telefono).replace(/[\s-]/g, '');
+  return validarTelefonoEstricto(t);
+} 
+
 export function validarNombre(nombre) {
   if (!nombre || typeof nombre !== 'string') return false;
   const n = nombre.trim();

@@ -99,13 +99,8 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   const exportPacienteJSON = (p) => exportJSON(p, `${p.nombres.replace(/\s+/g, '_')}.json`);
   const exportAllPacientesJSON = () => exportAllJSON(effectiveBaseDatos.pacientes || [], `pacientes.json`);
   const exportPacienteXML = (p) => exportXML(p, 'paciente', `${p.nombres.replace(/\s+/g, '_')}.xml`);
-  };
 
-  const exportAllXML = () => {
-    const items = (effectiveBaseDatos.pacientes || []).map(p => toXML(p, 'paciente')).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<pacientes>\n${items}\n</pacientes>`;
-    downloadFile(xml, `pacientes.xml`, 'application/xml');
-  };
+  const exportAllPacientesXML = () => exportAllXML(effectiveBaseDatos.pacientes || [], 'paciente', 'pacientes.xml');
 
   const ensureJsPDF = () => new Promise((resolve) => {
     const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;
@@ -480,7 +475,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
       onExportPacienteJSON={exportPacienteJSON}
       onExportAllJSON={exportAllJSON}
       onExportPacienteXML={exportPacienteXML}
-      onExportAllXML={exportAllXML}
+      onExportAllXML={exportAllPacientesXML}
     />
   );
 }

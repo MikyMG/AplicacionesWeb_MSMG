@@ -75,18 +75,7 @@ function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
   const exportAllFacturasJSON = () => exportAllJSON(effectiveBaseDatos.facturas || [], 'facturas.json');
   const exportAllFacturasXML = () => exportAllXML(effectiveBaseDatos.facturas || [], 'factura', 'facturas.xml');
 
-  const exportFacturaJSON = (f) => downloadFile(JSON.stringify(f, null, 2), `${(f.numeroFactura || 'factura').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllFacturasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.facturas || [], null, 2), `facturas.json`, 'application/json');
 
-  const exportFacturaXML = (f) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(f, 'factura');
-    downloadFile(xml, `${(f.numeroFactura || 'factura').replace(/\s+/g, '_')}.xml`, 'application/xml');
-  };
-  const exportAllFacturasXML = () => {
-    const items = (effectiveBaseDatos.facturas || []).map(f => toXML(f, 'factura')).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<facturas>\n${items}\n</facturas>`;
-    downloadFile(xml, `facturas.xml`, 'application/xml');
-  };
 
   const ensureJsPDF = () => new Promise((resolve) => {
     const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;

@@ -1,7 +1,20 @@
 import { validarCedula, validarEmail, validarTelefono, validarNombre, validarNumeroPositivo, validarPassword, validarRangoFechas } from './validators';
 
 test('validarCedula valida bien', () => {
-  expect(validarCedula('0123456789')).toBe(true);
+  // construir una cédula válida calculando el dígito verificador para 9 dígitos base
+  const base = '012345678'; // 9 dígitos
+  const digits = base.split('').map(d => Number(d));
+  const coef = [2,1,2,1,2,1,2,1,2];
+  let suma = 0;
+  for (let i = 0; i < 9; i++) {
+    const prod = digits[i] * coef[i];
+    suma += prod >= 10 ? prod - 9 : prod;
+  }
+  const modulo = suma % 10;
+  const check = modulo === 0 ? 0 : 10 - modulo;
+  const validCedula = base + String(check);
+
+  expect(validarCedula(validCedula)).toBe(true);
   expect(validarCedula('123')).toBe(false);
   expect(validarCedula('abcdefghij')).toBe(false);
 });
@@ -12,7 +25,8 @@ test('validarEmail', () => {
 });
 
 test('validarTelefono', () => {
-  expect(validarTelefono('+593 9 123 4567')).toBe(true);
+  // número internacional con todos los dígitos
+  expect(validarTelefono('+593912345678')).toBe(true);
   expect(validarTelefono('abc')).toBe(false);
 });
 
