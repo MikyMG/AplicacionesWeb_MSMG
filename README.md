@@ -68,3 +68,22 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+---
+
+## Migración parcial a Astro (experimental)
+
+He añadido soporte inicial para [Astro](https://astro.build) y la integración con React (`@astrojs/react`) para que puedas usar tus componentes React solo donde sean necesarios.
+
+- Ejecutar server de desarrollo (Astro): `npm run dev` o `npm run start:astro`
+- Construir para producción (Astro): `npm run build:astro` (salida en `dist/`)
+- Deploy en Netlify: configura el comando de build a `npm run build:astro` y la carpeta de publicación a `dist`
+
+### Recomendación de despliegue en Netlify (rápido)
+- Crear sitio nuevo y conectar tu repo.
+- En **Build settings** poner `npm run build:astro` como comando y `dist` como carpeta a publicar.
+- Si quieres usar el Netlify CLI en local puedes probar `netlify dev` (requiere instalación global).
+
+Nota: Mantengo por ahora los scripts de Create React App (`start`, `build`) por compatibilidad; cuando quieras puedo eliminarlos y dejar solo la versión con Astro.
+
+Por ahora los scripts de Create React App se mantienen para referencia; cuando quieras, puedo sustituirlos o eliminar lo que ya no necesites.

@@ -46,7 +46,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
       const citasPaciente = (baseDatos.citas || []).filter(c => c.cedula === p.cedula);
       if (citasPaciente.length > 0) {
         const last = citasPaciente.reduce((a, b) => new Date(a.fecha) > new Date(b.fecha) ? a : b);
-        setForm(prev => ({ ...prev, pacienteId: p.id, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0,10) : '' }));
+        setForm(prev => ({ ...prev, pacienteId: p.id, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0, 10) : '' }));
       } else {
         setForm(prev => ({ ...prev, pacienteId: p.id, ultimaFechaConsulta: '' }));
       }
@@ -142,10 +142,10 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
-  const toXML = (obj, tagName='historia') => {
+  const toXML = (obj, tagName = 'historia') => {
     let xml = `<${tagName}>`;
     Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
       xml += `<${k}>${v}</${k}>`;
     });
     xml += `</${tagName}>`;
@@ -169,11 +169,11 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     const jsPDF = await ensureJsPDF(); if (!jsPDF) { alert('No se pudo generar PDF (jsPDF no disponible)'); return; }
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
 
-    const primario = [193, 14, 26]; const cajaBg = [245,245,245];
+    const primario = [193, 14, 26]; const cajaBg = [245, 245, 245];
     let logoData = null; try { const logoUrl = require('../../assets/logo-uleam.png'); logoData = await getDataUrlFromUrl(logoUrl); } catch (e) { logoData = null; }
 
-    const headerH = 72; doc.setFillColor(...primario); doc.rect(0,0,doc.internal.pageSize.getWidth(), headerH, 'F'); doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.text('Historia Clínica', doc.internal.pageSize.getWidth()/2, headerH/2 + 6, { align: 'center' }); doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, doc.internal.pageSize.getWidth() - 40, headerH/2 + 6, { align: 'right' });
-    if (logoData) { const logoBoxW = 68; const logoBoxH = 44; const logoX = 40; const logoY = 14; doc.setFillColor(255,255,255); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(logoX, logoY, logoBoxW, logoBoxH, 6, 6, 'FD'); } else { doc.rect(logoX, logoY, logoBoxW, logoBoxH, 'FD'); } try { doc.addImage(logoData, 'PNG', logoX + 6, logoY + 6, logoBoxW - 12, logoBoxH - 12); } catch (err) {} }
+    const headerH = 72; doc.setFillColor(...primario); doc.rect(0, 0, doc.internal.pageSize.getWidth(), headerH, 'F'); doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.text('Historia Clínica', doc.internal.pageSize.getWidth() / 2, headerH / 2 + 6, { align: 'center' }); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, doc.internal.pageSize.getWidth() - 40, headerH / 2 + 6, { align: 'right' });
+    if (logoData) { const logoBoxW = 68; const logoBoxH = 44; const logoX = 40; const logoY = 14; doc.setFillColor(255, 255, 255); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(logoX, logoY, logoBoxW, logoBoxH, 6, 6, 'FD'); } else { doc.rect(logoX, logoY, logoBoxW, logoBoxH, 'FD'); } try { doc.addImage(logoData, 'PNG', logoX + 6, logoY + 6, logoBoxW - 12, logoBoxH - 12); } catch (err) { } }
 
     const left = 40; let y = headerH + 18; const width = doc.internal.pageSize.getWidth() - left * 2;
 
@@ -187,22 +187,22 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     const labelOffset = 130; const valueWidth = width - labelOffset - 40; const lineHeight = 14;
     const linesArr = items.map(it => doc.splitTextToSize(String(it.v == null ? '' : it.v), valueWidth));
     const heights = linesArr.map(l => Math.max(1, l.length) * lineHeight + 10);
-    let cardH = Math.max(160, 40 + heights.reduce((a,b)=>a+b,0) + 40);
+    let cardH = Math.max(160, 40 + heights.reduce((a, b) => a + b, 0) + 40);
 
     // si no cabe, partir en segmentos parecidos a reportes y agregar "— Continuación —" en páginas adicionales
-    const usableBottom = doc.internal.pageSize.getHeight() - 120; let idx=0; let first=true; while (idx < items.length) {
+    const usableBottom = doc.internal.pageSize.getHeight() - 120; let idx = 0; let first = true; while (idx < items.length) {
       let available = usableBottom - y; let total = first ? 30 : 0; let end = idx; while (end < items.length && total + heights[end] <= available) { total += heights[end]; end++; }
-      if (end === idx) { total = (first ? 30 : 0) + heights[idx]; end = idx+1; }
+      if (end === idx) { total = (first ? 30 : 0) + heights[idx]; end = idx + 1; }
       const segH = total + 30; doc.setFillColor(...cajaBg); doc.setDrawColor(...primario); if (typeof doc.roundedRect === 'function') { doc.roundedRect(left, y, width, segH, 6, 6, 'FD'); } else { doc.rect(left, y, width, segH, 'FD'); }
-      doc.setFont('helvetica','bold'); doc.setTextColor(...primario); doc.setFontSize(14); doc.text(`${h.pacienteNombres}`, left + 16, y + 30);
-      if (!first) { doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text('— Continuación —', doc.internal.pageSize.getWidth() / 2, y + 18, { align: 'center' }); doc.setFontSize(10); }
-      doc.setFont('helvetica','normal'); doc.setTextColor(0,0,0); doc.setFontSize(10); let ry = y + 54; for (let k = idx; k < end; k++) { doc.setTextColor(...primario); doc.setFont('helvetica','bold'); doc.text(`${items[k].label}:`, left + 16, ry); doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); doc.text(linesArr[k], left + 16 + labelOffset, ry); ry += heights[k]; }
-      idx = end; first=false; if (idx < items.length) { doc.addPage(); y = 40; } else { y = y + segH + 18; }
+      doc.setFont('helvetica', 'bold'); doc.setTextColor(...primario); doc.setFontSize(14); doc.text(`${h.pacienteNombres}`, left + 16, y + 30);
+      if (!first) { doc.setFontSize(10); doc.setTextColor(120, 120, 120); doc.text('— Continuación —', doc.internal.pageSize.getWidth() / 2, y + 18, { align: 'center' }); doc.setFontSize(10); }
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(0, 0, 0); doc.setFontSize(10); let ry = y + 54; for (let k = idx; k < end; k++) { doc.setTextColor(...primario); doc.setFont('helvetica', 'bold'); doc.text(`${items[k].label}:`, left + 16, ry); doc.setTextColor(0, 0, 0); doc.setFont('helvetica', 'normal'); doc.text(linesArr[k], left + 16 + labelOffset, ry); ry += heights[k]; }
+      idx = end; first = false; if (idx < items.length) { doc.addPage(); y = 40; } else { y = y + segH + 18; }
     }
 
     // footer
     doc.setDrawColor(...primario); doc.setLineWidth(0.6); doc.line(left, doc.internal.pageSize.getHeight() - 80, doc.internal.pageSize.getWidth() - left, doc.internal.pageSize.getHeight() - 80);
-    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text('Policlínico Uleam • ' + new Date().getFullYear(), left, doc.internal.pageSize.getHeight() - 60);
+    doc.setFontSize(10); doc.setTextColor(120, 120, 120); doc.text('Policlínico Uleam • ' + new Date().getFullYear(), left, doc.internal.pageSize.getHeight() - 60);
 
     doc.save(`${(h.pacienteNombres || 'historia').replace(/\s+/g, '_')}.pdf`);
   };
@@ -246,7 +246,7 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
       const citasPaciente = (baseDatos.citas || []).filter(c => c.cedula === p.cedula);
       if (citasPaciente.length > 0) {
         const last = citasPaciente.reduce((a, b) => new Date(a.fecha) > new Date(b.fecha) ? a : b);
-        setForm(prev => ({ ...prev, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0,10) : '' }));
+        setForm(prev => ({ ...prev, ultimaFechaConsulta: last.fecha ? new Date(last.fecha).toISOString().slice(0, 10) : '' }));
       }
     }
   };
@@ -261,7 +261,8 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     if (form.frecuenciaRespiratoria && !validarNumeroRango(form.frecuenciaRespiratoria, 5, 60)) { mostrarErrores(['Frecuencia respiratoria fuera de rango plausible']); mostrarMensaje('Frecuencia respiratoria fuera de rango plausible', 'error'); return; }
     if (form.proximaCita && (!validarFechaISO(form.proximaCita) || !fechaNoPasada(form.proximaCita))) { mostrarErrores(['Próxima cita inválida o en el pasado']); mostrarMensaje('Próxima cita inválida o en el pasado', 'error'); return; }
 
-    const updatedList = (baseDatos.historias || []).map(h => h.id === editingId ? { ...h,
+    const updatedList = (baseDatos.historias || []).map(h => h.id === editingId ? {
+      ...h,
       ultimaFechaConsulta: form.ultimaFechaConsulta,
       medico: form.medico,
       especialidad: form.especialidad,

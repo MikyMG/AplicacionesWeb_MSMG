@@ -16,11 +16,16 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:astro": "astro dev",
+    "dev": "astro dev",
     "build": "react-scripts build",
+    "build:astro": "astro build",
     "test": "react-scripts test",
+    "preview": "astro preview",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "deploy:netlify": "npm run build:astro && echo 'Built for Netlify in /dist'"
   },
   "eslintConfig": {
     "extends": [
@@ -41,6 +46,9 @@
     ]
   },
   "devDependencies": {
+    "@astrojs/netlify": "^6.6.3",
+    "@astrojs/react": "^4.4.2",
+    "astro": "^5.16.6",
     "gh-pages": "^6.3.0"
   }
 }
