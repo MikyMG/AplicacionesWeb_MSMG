@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import MedicosView from '../presentational/MedicosView';
 import { validarEmail, validarTelefonoEstricto, validarNombre, validarSeleccion, isEmailInUse } from '../../services/validators';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ nombre: '', especialidad: '', telefono: '', correo: '' });
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
+
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => {
+    if (typeof onActualizar === 'function') {
+      try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch(e2) { /* noop */ } }
+    }
+    setStoredBaseDatos(prev => ({ ...prev, [key]: value }));
+  };
   const [editingId, setEditingId] = useState(null);
 
   const mostrarMensaje = (texto, tipo) => {
@@ -23,13 +33,13 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
     if (!formData.correo || !validarEmail(formData.correo)) { mostrarErrores(['Correo inválido']); mostrarMensaje('Correo inválido', 'error'); return; }
     if (formData.telefono && !validarTelefonoEstricto(formData.telefono)) { mostrarErrores(['Teléfono inválido (use 09xxxxxxxx)']); mostrarMensaje('Teléfono inválido (use 09xxxxxxxx)', 'error'); return; }
 
-    const correoExistenteLocal = formData.correo ? baseDatos.medicos.some(m => m.correo && m.correo.toLowerCase() === String(formData.correo).toLowerCase() && m.id !== editingId) : false;
-    const correoUsadoGlobal = formData.correo ? isEmailInUse(formData.correo, baseDatos, { excludeType: 'medico', excludeId: editingId }) : false;
+    const correoExistenteLocal = formData.correo ? (effectiveBaseDatos.medicos || []).some(m => m.correo && m.correo.toLowerCase() === String(formData.correo).toLowerCase() && m.id !== editingId) : false;
+    const correoUsadoGlobal = formData.correo ? isEmailInUse(formData.correo, effectiveBaseDatos, { excludeType: 'medico', excludeId: editingId }) : false;
     if (correoExistenteLocal || correoUsadoGlobal) { mostrarErrores(['Correo ya registrado']); mostrarMensaje('Correo ya registrado', 'error'); return; }
 
     if (editingId) {
-      const actualizado = baseDatos.medicos.map(m => m.id === editingId ? { ...m, ...formData } : m);
-      onActualizar(actualizado);
+      const actualizado = (effectiveBaseDatos.medicos || []).map(m => m.id === editingId ? { ...m, ...formData } : m);
+      updateStore('medicos', actualizado);
       mostrarMensaje('Médico actualizado', 'exito');
       setEditingId(null);
       setFormData({ nombre: '', especialidad: '', telefono: '', correo: '' });
@@ -37,14 +47,14 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
     }
 
     const nuevoMedico = { id: Date.now().toString(), ...formData, fechaRegistro: new Date().toLocaleString() };
-    onActualizar([...baseDatos.medicos, nuevoMedico]);
+    updateStore('medicos', [...effectiveBaseDatos.medicos, nuevoMedico]);
     mostrarMensaje('Médico registrado exitosamente', 'exito');
     setFormData({ nombre: '', especialidad: '', telefono: '', correo: '' });
   };
 
   const eliminar = (id) => {
     if (window.confirm('¿Eliminar médico?')) {
-      onActualizar(baseDatos.medicos.filter(m => m.id !== id));
+      updateStore('medicos', effectiveBaseDatos.medicos.filter(m => m.id !== id));
       mostrarMensaje('Médico eliminado', 'info');
     }
   };
@@ -89,14 +99,14 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportMedicoJSON = (m) => downloadFile(JSON.stringify(m, null, 2), `${(m.nombre || 'medico').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllMedicosJSON = () => downloadFile(JSON.stringify(baseDatos.medicos, null, 2), `medicos.json`, 'application/json');
+  const exportAllMedicosJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.medicos || [], null, 2), `medicos.json`, 'application/json');
 
   const exportMedicoXML = (m) => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(m, 'medico');
     downloadFile(xml, `${(m.nombre || 'medico').replace(/\s+/g, '_')}.xml`, 'application/xml');
   };
   const exportAllMedicosXML = () => {
-    const items = (baseDatos.medicos || []).map(m => toXML(m, 'medico')).join('\n');
+    const items = (effectiveBaseDatos.medicos || []).map(m => toXML(m, 'medico')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<medicos>\n${items}\n</medicos>`;
     downloadFile(xml, `medicos.xml`, 'application/xml');
   };
@@ -231,7 +241,7 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
     const left = 40;
     const width = doc.internal.pageSize.getWidth() - left * 2;
 
-    (baseDatos.medicos || []).forEach((m, idx) => {
+    (effectiveBaseDatos.medicos || []).forEach((m, idx) => {
       if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 90; }
 
       const h = 80;
@@ -246,14 +256,14 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
       y += h + 12;
     });
 
-    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(baseDatos.medicos || []).length} médicos`, left, doc.internal.pageSize.getHeight() - 40);
+    doc.setFontSize(10); doc.setTextColor(120,120,120); doc.text(`Total: ${(effectiveBaseDatos.medicos || []).length} médicos`, left, doc.internal.pageSize.getHeight() - 40);
 
     doc.save('medicos.pdf');
   }; 
 
   return (
     <MedicosView
-      medicos={baseDatos.medicos}
+      medicos={effectiveBaseDatos.medicos || []}
       formData={formData}
       onChange={onChange}
       onSubmit={handleSubmit}
