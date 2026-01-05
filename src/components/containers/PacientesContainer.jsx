@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import PacientesView from '../presentational/PacientesView';
 import { validarCedula, validarEmail, validarTelefonoEstricto, validarNombre, validarFechaNacimientoPasada, validarNumeroRango, isEmailInUse } from '../../services/validators';
 import useForm from '../../hooks/useForm';
+import useLocalStorage from '../../hooks/useLocalStorage';
+
+  // fallback localStorage para usar el container como página independiente
+
 
 function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   const { values: formData, setValues, handleChange, reset } = useForm({
@@ -12,6 +16,15 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
   const [editingId, setEditingId] = useState(null);
+
+  const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });
+  const effectiveBaseDatos = baseDatos || storedBaseDatos;
+  const updateStore = (key, value) => {
+    if (typeof onActualizar === 'function') {
+      try { onActualizar(key, value); return; } catch (e) { try { onActualizar(value); return; } catch(e2) { /* noop */ } }
+    }
+    setStoredBaseDatos(prev => ({ ...prev, [key]: value }));
+  }; 
 
   const mostrarMensaje = (texto, tipo) => {
     setMensaje({ texto, tipo });
@@ -53,16 +66,16 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     if (formData.peso && !validarNumeroRango(formData.peso, 2, 500)) { mostrarErrores(['Peso fuera de rango plausible (2-500 kg)']); mostrarMensaje('Peso fuera de rango plausible (2-500 kg)', 'error'); return; }
     if (formData.estatura && !validarNumeroRango(formData.estatura, 0.3, 2.5)) { mostrarErrores(['Estatura fuera de rango plausible (0.3-2.5 m)']); mostrarMensaje('Estatura fuera de rango plausible (0.3-2.5 m)', 'error'); return; }
 
-    const cedulaExiste = baseDatos.pacientes.some(p => p.cedula === formData.cedula && p.id !== editingId);
-    const emailExisteLocal = formData.email ? baseDatos.pacientes.some(p => p.email && p.email.toLowerCase() === String(formData.email).toLowerCase() && p.id !== editingId) : false;
-    const emailUsadaGlobal = formData.email ? isEmailInUse(formData.email, baseDatos, { excludeType: 'paciente', excludeId: editingId }) : false;
+    const cedulaExiste = (effectiveBaseDatos.pacientes || []).some(p => p.cedula === formData.cedula && p.id !== editingId);
+    const emailExisteLocal = formData.email ? (effectiveBaseDatos.pacientes || []).some(p => p.email && p.email.toLowerCase() === String(formData.email).toLowerCase() && p.id !== editingId) : false;
+    const emailUsadaGlobal = formData.email ? isEmailInUse(formData.email, effectiveBaseDatos, { excludeType: 'paciente', excludeId: editingId }) : false;
     if (cedulaExiste) { mostrarErrores(['Cédula ya registrada']); mostrarMensaje('Cédula ya registrada', 'error'); return; }
     if (emailExisteLocal || emailUsadaGlobal) { mostrarErrores(['Email ya registrado']); mostrarMensaje('Email ya registrado', 'error'); return; }
 
     if (editingId) {
       // actualizar paciente existente (asegurar tipo de sangre válido)
-      const actualizado = baseDatos.pacientes.map(p => p.id === editingId ? { ...p, ...formData, tipoSangre: tipoSangreValida } : p);
-      onActualizar(actualizado);
+      const actualizado = effectiveBaseDatos.pacientes.map(p => p.id === editingId ? { ...p, ...formData, tipoSangre: tipoSangreValida } : p);
+      updateStore('pacientes', actualizado);
       mostrarMensaje('Paciente actualizado', 'exito');
       setEditingId(null);
       setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', lugarNacimiento: '', ocupacion: '', direccion: '', ciudad: '', provincia: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
@@ -70,14 +83,14 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     }
 
     const nuevoPaciente = { id: Date.now().toString(), ...formData, tipoSangre: tipoSangreValida, fechaRegistro: new Date().toLocaleString() };
-    onActualizar([...baseDatos.pacientes, nuevoPaciente]);
+    updateStore('pacientes', [...effectiveBaseDatos.pacientes, nuevoPaciente]);
     mostrarMensaje('Paciente registrado exitosamente', 'exito');
     setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', lugarNacimiento: '', ocupacion: '', direccion: '', ciudad: '', provincia: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
   };
 
   const eliminarPaciente = (id) => {
     if (window.confirm('¿Está seguro que desea eliminar este paciente?')) {
-      onActualizar(baseDatos.pacientes.filter(p => p.id !== id));
+      updateStore('pacientes', effectiveBaseDatos.pacientes.filter(p => p.id !== id));
       mostrarMensaje('Paciente eliminado', 'info');
     }
   };
@@ -99,7 +112,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportAllJSON = () => {
-    downloadFile(JSON.stringify(baseDatos.pacientes, null, 2), `pacientes.json`, 'application/json');
+    downloadFile(JSON.stringify(effectiveBaseDatos.pacientes || [], null, 2), `pacientes.json`, 'application/json');
   };
 
   const toXML = (obj, tagName = 'paciente') => {
@@ -118,7 +131,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   const exportAllXML = () => {
-    const items = baseDatos.pacientes.map(p => toXML(p, 'paciente')).join('\n');
+    const items = (effectiveBaseDatos.pacientes || []).map(p => toXML(p, 'paciente')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<pacientes>\n${items}\n</pacientes>`;
     downloadFile(xml, `pacientes.xml`, 'application/xml');
   };
@@ -351,7 +364,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     const left = 40;
     const width = doc.internal.pageSize.getWidth() - left * 2;
 
-    (baseDatos.pacientes || []).forEach((p, idx) => {
+    (effectiveBaseDatos.pacientes || []).forEach((p, idx) => {
       // nueva página si no hay espacio
       if (y > doc.internal.pageSize.getHeight() - 140) { doc.addPage(); y = 90; }
 
@@ -382,7 +395,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     // pie
     doc.setFontSize(10);
     doc.setTextColor(120, 120, 120);
-    doc.text(`Total: ${(baseDatos.pacientes || []).length} pacientes`, left, doc.internal.pageSize.getHeight() - 40);
+    doc.text(`Total: ${(effectiveBaseDatos.pacientes || []).length} pacientes`, left, doc.internal.pageSize.getHeight() - 40);
 
     doc.save('pacientes.pdf');
   };
@@ -435,9 +448,9 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
 
   useEffect(() => {
     // Normalizar tipo de sangre en registros existentes al cargar
-    const cleaned = (baseDatos.pacientes || []).map(p => ({ ...p, tipoSangre: BLOOD_TYPES.includes(p.tipoSangre) ? p.tipoSangre : '' }));
-    if (JSON.stringify(cleaned) !== JSON.stringify(baseDatos.pacientes)) {
-      onActualizar(cleaned);
+    const cleaned = (effectiveBaseDatos.pacientes || []).map(p => ({ ...p, tipoSangre: BLOOD_TYPES.includes(p.tipoSangre) ? p.tipoSangre : '' }));
+    if (JSON.stringify(cleaned) !== JSON.stringify(effectiveBaseDatos.pacientes)) {
+      updateStore('pacientes', cleaned);
     }
   }, []);
 
@@ -480,7 +493,7 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
 
   return (
     <PacientesView
-      pacientes={baseDatos.pacientes}
+      pacientes={effectiveBaseDatos.pacientes || []}
       formData={formData}
       onChange={onChange}
       onSubmit={handleSubmit}
