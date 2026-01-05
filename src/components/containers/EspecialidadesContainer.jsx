@@ -66,36 +66,10 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
     setFormData({ especialidad: esp.especialidad || '', descripcion: esp.descripcion || '', responsable: esp.responsable || '' });
   };
 
-  // helpers de descarga (JSON / XML / PDF)
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'especialidad') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
-
-  const exportEspecialidadJSON = (e) => downloadFile(JSON.stringify(e, null, 2), `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllEspecialidadesJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.especialidades || [], null, 2), `especialidades.json`, 'application/json');
-
-  const exportEspecialidadXML = (e) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(e, 'especialidad');
-    downloadFile(xml, `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.xml`, 'application/xml');
-  };
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportEspecialidadJSON = (e) => exportJSON(e, `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.json`);
+  const exportAllEspecialidadesJSON = () => exportAllJSON(effectiveBaseDatos.especialidades || [], `especialidades.json`);
+  const exportEspecialidadXML = (e) => exportXML(e, 'especialidad', `${(e.especialidad || 'especialidad').replace(/\s+/g, '_')}.xml`);
   const exportAllEspecialidadesXML = () => {
     const items = (effectiveBaseDatos.especialidades || []).map(ex => toXML(ex, 'especialidad')).join('\n');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<especialidades>\n${items}\n</especialidades>`;

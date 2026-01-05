@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CitasView } from '@components/presentational';
 import { useForm } from '@hooks';
 import { useLocalStorage } from '@hooks';
+import { exportJSON, exportAllJSON, exportXML, exportAllXML, ensureJsPDF, getDataUrlFromUrl } from '@utils/exporters';
 
   // fallback localStorage para uso como página independiente
 import { validarSeleccion, fechaNoPasada } from '../../services/validators';
@@ -104,8 +105,8 @@ function CitasContainer({ baseDatos, onActualizar, onVolver }) {
   };
 
   // helpers de descarga centralizados en `@utils/exporters` (downloadFile, toXML, ensureJsPDF, getDataUrlFromUrl)
-  const exportCitaJSON = (c) => downloadFile(JSON.stringify(c, null, 2), `${(c.paciente || 'cita').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllCitasJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.citas || [], null, 2), `citas.json`, 'application/json');
+  const exportCitaJSON = (c) => exportJSON(c, `${(c.paciente || 'cita').replace(/\s+/g, '_')}.json`);
+  const exportAllCitasJSON = () => exportAllJSON(effectiveBaseDatos.citas || [], `citas.json`);
 
   const exportCitaXML = (c) => exportXML(c, 'cita', `${(c.paciente || 'cita').replace(/\s+/g, '_')}.xml`);
   const exportAllCitasXML = () => exportAllXML(effectiveBaseDatos.citas || [], 'cita', `citas.xml`);

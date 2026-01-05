@@ -148,35 +148,9 @@ function HistorialContainer({ baseDatos, onActualizar, onVolver }) {
     setForm(prev => ({ ...prev, motivoConsulta: '', antecedentesMedicos: '', antecedentesPersonales: '', antecedentesFamiliares: '', habitos: '', peso: '', estatura: '', presionArterial: '', frecuenciaCardiaca: '', frecuenciaRespiratoria: '', temperatura: '', saturacionOxigeno: '', imc: '', observacionesFisicas: '', diagnosticoPrincipal: '', diagnosticoSecundario: '', tratamiento: '', recomendaciones: '', examenesSolicitados: '', proximaCita: '', observacionesAdicionales: '' }));
   };
 
-  // helpers de export
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'historia') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
-
-  const ensureJsPDF = () => new Promise((resolve) => {
-    const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;
-    if (existing) { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); return; }
-    const script = document.createElement('script'); script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'; script.onload = () => { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); }; document.body.appendChild(script);
-  });
-
-  const getDataUrlFromUrl = async (url) => {
-    try { if (!url) return null; const res = await fetch(url); const blob = await res.blob(); return await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob); }); } catch (e) { return null; }
-  };
-
-  const exportHistoriaJSON = (h) => downloadFile(JSON.stringify(h, null, 2), `${(h.pacienteNombres || 'historia').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportHistoriaXML = (h) => { const xml = '<?xml version="1.0" encoding="UTF-8"?>\n' + toXML(h, 'historia'); downloadFile(xml, `${(h.pacienteNombres || 'historia').replace(/\s+/g, '_')}.xml`, 'application/xml'); };
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportHistoriaJSON = (h) => exportJSON(h, `${(h.pacienteNombres || 'historia').replace(/\s+/g, '_')}.json`);
+  const exportHistoriaXML = (h) => exportXML(h, 'historia', `${(h.pacienteNombres || 'historia').replace(/\s+/g, '_')}.xml`);
 
   const exportHistoriaPDF = async (h) => {
     const jsPDF = await ensureJsPDF(); if (!jsPDF) { alert('No se pudo generar PDF (jsPDF no disponible)'); return; }

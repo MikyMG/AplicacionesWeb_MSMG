@@ -95,39 +95,10 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     }
   };
 
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const exportPacienteJSON = (p) => {
-    downloadFile(JSON.stringify(p, null, 2), `${p.nombres.replace(/\s+/g, '_')}.json`, 'application/json');
-  };
-
-  const exportAllJSON = () => {
-    downloadFile(JSON.stringify(effectiveBaseDatos.pacientes || [], null, 2), `pacientes.json`, 'application/json');
-  };
-
-  const toXML = (obj, tagName = 'paciente') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
-
-  const exportPacienteXML = (p) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(p, 'paciente');
-    downloadFile(xml, `${p.nombres.replace(/\s+/g, '_')}.xml`, 'application/xml');
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportPacienteJSON = (p) => exportJSON(p, `${p.nombres.replace(/\s+/g, '_')}.json`);
+  const exportAllPacientesJSON = () => exportAllJSON(effectiveBaseDatos.pacientes || [], `pacientes.json`);
+  const exportPacienteXML = (p) => exportXML(p, 'paciente', `${p.nombres.replace(/\s+/g, '_')}.xml`);
   };
 
   const exportAllXML = () => {

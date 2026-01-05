@@ -76,50 +76,12 @@ function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
     setFormData({ nombre: medico.nombre || '', especialidad: medico.especialidad || '', telefono: medico.telefono || '', correo: medico.correo || '' });
   };
 
-  // helpers de descarga
-  const downloadFile = (content, filename, type = 'application/octet-stream') => {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  const toXML = (obj, tagName = 'medico') => {
-    let xml = `<${tagName}>`;
-    Object.keys(obj).forEach(k => {
-      const v = obj[k] == null ? '' : String(obj[k]).replace(/&/g, '&amp;').replace(/</g, '&lt;');
-      xml += `<${k}>${v}</${k}>`;
-    });
-    xml += `</${tagName}>`;
-    return xml;
-  };
-
-  const exportMedicoJSON = (m) => downloadFile(JSON.stringify(m, null, 2), `${(m.nombre || 'medico').replace(/\s+/g, '_')}.json`, 'application/json');
-  const exportAllMedicosJSON = () => downloadFile(JSON.stringify(effectiveBaseDatos.medicos || [], null, 2), `medicos.json`, 'application/json');
-
-  const exportMedicoXML = (m) => {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + toXML(m, 'medico');
-    downloadFile(xml, `${(m.nombre || 'medico').replace(/\s+/g, '_')}.xml`, 'application/xml');
-  };
-  const exportAllMedicosXML = () => {
-    const items = (effectiveBaseDatos.medicos || []).map(m => toXML(m, 'medico')).join('\n');
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<medicos>\n${items}\n</medicos>`;
-    downloadFile(xml, `medicos.xml`, 'application/xml');
-  };
-
-  const ensureJsPDF = () => new Promise((resolve) => {
-    const existing = window.jspdf || window.jspdf?.jsPDF || window.jspdf?.default;
-    if (existing) { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); return; }
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    script.onload = () => { const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null; resolve(jsPDF); };
-    document.body.appendChild(script);
-  });
+  // helpers de descarga centralizados en `@utils/exporters`
+  const exportMedicoJSON = (m) => exportJSON(m, `${(m.nombre || 'medico').replace(/\s+/g, '_')}.json`);
+  const exportAllMedicosJSON = () => exportAllJSON(effectiveBaseDatos.medicos || [], `medicos.json`);
+  const exportMedicoXML = (m) => exportXML(m, 'medico', `${(m.nombre || 'medico').replace(/\s+/g, '_')}.xml`);
+  const exportAllMedicosXML = () => exportAllXML(effectiveBaseDatos.medicos || [], 'medico', `medicos.xml`);
+  // Para PDFs usamos `ensureJsPDF` y `getDataUrlFromUrl` importados de `@utils/exporters`
 
   const getDataUrlFromUrl = async (url) => {
     try {
