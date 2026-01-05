@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import FacturacionView from '../presentational/FacturacionView';
-import { validarNumeroRango, validarSeleccion, validarFechaISO } from '../../services/validators';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { FacturacionView } from '@components/presentational';
+import { validarNumeroRango, validarSeleccion, validarFechaISO } from '@services';
+import { useLocalStorage } from '@hooks';
 
 function FacturacionContainer({ baseDatos, onActualizar, onVolver }) {
   const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });

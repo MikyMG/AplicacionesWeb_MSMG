@@ -1,4 +1,5 @@
 // Validadores de datos comunes
+import { safeParseItem } from '../utils/storage';
 export function validarCedula(cedula) {
   // Validación completa para cédula ecuatoriana (10 dígitos)
   if (!cedula || typeof cedula !== 'string') return false;
@@ -185,12 +186,8 @@ export function isEmailInUse(email, baseDatos = {}, { excludeType = null, exclud
   }
 
   // Listados conocidos (localStorage)
-  try {
-    const known = JSON.parse(localStorage.getItem('knownEmails') || '[]');
-    if (Array.isArray(known) && known.some(k => String(k).trim().toLowerCase() === e)) return true;
-  } catch (err) {
-    // noop
-  }
+  const known = safeParseItem('knownEmails', []);
+  if (Array.isArray(known) && known.some(k => String(k).trim().toLowerCase() === e)) return true;
 
   return false;
 }

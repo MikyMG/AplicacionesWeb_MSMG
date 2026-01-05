@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import EspecialidadesView from '../presentational/EspecialidadesView';
-import { validarNombre } from '../../services/validators';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { EspecialidadesView } from '@components/presentational';
+import { validarNombre } from '@services';
+import { useLocalStorage } from '@hooks';
 
 function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ especialidad: '', descripcion: '', responsable: '' });

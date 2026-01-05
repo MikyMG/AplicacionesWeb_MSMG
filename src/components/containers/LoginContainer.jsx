@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import LoginView from "../presentational/LoginView";
-import useLocalStorage from "../../hooks/useLocalStorage";
+import { LoginView } from '@components/presentational';
+import { useLocalStorage } from '@hooks';
 import {
   validarEmailInstitucional,
   validarPassword,
   evaluarPassword,
   validarEmailPorRol,
   isEmailInUse,
-} from "../../services/validators";
+} from '@services';
+import { safeParseItem, safeSetItem } from '../../utils/storage';
 
 function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
   const [formData, setFormData] = useState({
@@ -51,15 +52,7 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
   const [regPassword, setRegPassword] = useState("");
   const [regConfirm, setRegConfirm] = useState("");
 
-  // Helper seguro para parsear JSON desde localStorage
-  const safeParse = (value, fallback) => {
-    try {
-      if (!value) return fallback;
-      return JSON.parse(value);
-    } catch (err) {
-      return fallback;
-    }
-  };
+
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => {
@@ -100,20 +93,16 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Guardar contraseña en localStorage (simulación)
-    const users = safeParse(localStorage.getItem("userPasswords"), {});
+    const users = safeParseItem('userPasswords', {});
     users[resetEmail.toLowerCase()] = resetPassword;
-    try { localStorage.setItem("userPasswords", JSON.stringify(users)); } catch (err) { /* noop */ }
+    safeSetItem('userPasswords', users);
 
     // Registrar correo conocido para evitar que sea usado por otra cuenta en el futuro
-    try {
-      const known = safeParse(localStorage.getItem("knownEmails"), []);
-      const norm = resetEmail.toLowerCase();
-      if (!known.some((k) => k === norm)) {
-        known.push(norm);
-        try { localStorage.setItem("knownEmails", JSON.stringify(known)); } catch (err) { /* noop */ }
-      }
-    } catch (err) {
-      // noop
+    const known = safeParseItem('knownEmails', []);
+    const norm = resetEmail.toLowerCase();
+    if (!known.some((k) => k === norm)) {
+      known.push(norm);
+      safeSetItem('knownEmails', known);
     }
 
     mostrarMensaje("Contraseña restablecida correctamente", "exito");
@@ -154,19 +143,15 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Guardar usuario
-    const users = safeParse(localStorage.getItem("userPasswords"), {});
+    const users = safeParseItem('userPasswords', {});
     users[regEmail.toLowerCase()] = regPassword;
-    try { localStorage.setItem("userPasswords", JSON.stringify(users)); } catch (err) { /* noop */ }
+    safeSetItem('userPasswords', users);
 
-    try {
-      const known = safeParse(localStorage.getItem("knownEmails"), []);
-      const norm = regEmail.toLowerCase();
-      if (!known.some((k) => k === norm)) {
-        known.push(norm);
-        try { localStorage.setItem("knownEmails", JSON.stringify(known)); } catch (err) { /* noop */ }
-      }
-    } catch (err) {
-      /* noop */
+    const known = safeParseItem('knownEmails', []);
+    const norm = regEmail.toLowerCase();
+    if (!known.some((k) => k === norm)) {
+      known.push(norm);
+      safeSetItem('knownEmails', known);
     }
 
     // Auto-login tras registro
@@ -224,7 +209,7 @@ function LoginContainer({ onLogin: onLoginFromApp, onGoToResetPage }) {
     }
 
     // Verificar credenciales contra almacenamiento simulado
-    const users = safeParse(localStorage.getItem("userPasswords"), {});
+    const users = safeParseItem('userPasswords', {});
     const normUsuario = String(formData.usuario).toLowerCase();
     const stored = users[normUsuario];
     if (!stored) {

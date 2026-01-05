@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ReportesView from '../presentational/ReportesView';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { ReportesView } from '@components/presentational';
+import { useLocalStorage } from '@hooks';
 
 function ReportesContainer({ baseDatos, onVolver, onActualizar }) {
   const [storedBaseDatos, setStoredBaseDatos] = useLocalStorage('policlinico_datos', { pacientes: [], citas: [], medicos: [], especialidades: [], facturas: [], historias: [] });

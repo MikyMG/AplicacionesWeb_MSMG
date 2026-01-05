@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import ResetPasswordView from '../presentational/ResetPasswordView';
-import { validarEmailInstitucional, validarPassword, evaluarPassword } from '../../services/validators';
+import { ResetPasswordView } from '@components/presentational';
+import { validarEmailInstitucional, validarPassword, evaluarPassword } from '@services';
+import { safeParseItem, safeSetItem } from '../../utils/storage';
 
 function ResetPasswordContainer({ onVolver }) {
   const [email, setEmail] = useState('');
@@ -36,8 +37,7 @@ function ResetPasswordContainer({ onVolver }) {
     if (!validarPassword(password)) { const ev = evaluarPassword(password); mostrarErrores(ev.reasons && ev.reasons.length ? ev.reasons : ['La contraseña no cumple requisitos']); mostrarMensaje('Contraseña inválida', 'error'); return; }
     if (password !== confirm) { mostrarErrores(['Las contraseñas no coinciden']); mostrarMensaje('Las contraseñas no coinciden', 'error'); return; }
 
-    let resets = [];
-    try { resets = JSON.parse(localStorage.getItem('passwordResets') || '[]'); } catch (err) { resets = []; }
+    let resets = safeParseItem('passwordResets', []);
     const foundIndex = resets.findIndex(r => r.email.toLowerCase() === email.toLowerCase() && r.token.toUpperCase() === token.toUpperCase());
     if (foundIndex === -1) {
       mostrarMensaje('Token o correo inválido', 'error');
@@ -55,11 +55,9 @@ function ResetPasswordContainer({ onVolver }) {
     }
 
     // guardar contraseña en localStorage (simulación)
-    try {
-      const users = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-      users[email.toLowerCase()] = password;
-      localStorage.setItem('userPasswords', JSON.stringify(users));
-    } catch (err) { /* noop */ }
+    const users = safeParseItem('userPasswords', {});
+    users[email.toLowerCase()] = password;
+    safeSetItem('userPasswords', users);
 
     // eliminar la solicitud de reset
     resets.splice(foundIndex, 1);

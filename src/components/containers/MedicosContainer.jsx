@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import MedicosView from '../presentational/MedicosView';
-import { validarEmail, validarTelefonoEstricto, validarNombre, validarSeleccion, isEmailInUse } from '../../services/validators';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { MedicosView } from '@components/presentational';
+import { validarEmail, validarTelefonoEstricto, validarNombre, validarSeleccion, isEmailInUse } from '@services';
+import { useLocalStorage } from '@hooks';
 
 function MedicosContainer({ baseDatos, onActualizar, onVolver }) {
   const [formData, setFormData] = useState({ nombre: '', especialidad: '', telefono: '', correo: '' });

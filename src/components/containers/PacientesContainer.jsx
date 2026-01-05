@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import PacientesView from '../presentational/PacientesView';
-import { validarCedula, validarEmail, validarTelefonoEstricto, validarNombre, validarFechaNacimientoPasada, validarNumeroRango, isEmailInUse } from '../../services/validators';
-import useForm from '../../hooks/useForm';
-import useLocalStorage from '../../hooks/useLocalStorage';
+import { PacientesView } from '@components/presentational';
+import { validarCedula, validarEmail, validarTelefonoEstricto, validarNombre, validarFechaNacimientoPasada, validarNumeroRango, isEmailInUse } from '@services';
+import { useForm, useLocalStorage } from '@hooks';
 
   // fallback localStorage para usar el container como página independiente
 
