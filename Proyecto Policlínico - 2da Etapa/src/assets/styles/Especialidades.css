@@ -1,0 +1,17 @@
+.especialidad-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+}
+
+.especialidad-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+  border-color: var(--primario-claro);
+}

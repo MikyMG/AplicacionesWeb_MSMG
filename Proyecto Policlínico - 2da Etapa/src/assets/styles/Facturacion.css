@@ -1,0 +1,15 @@
+.factura-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+  margin-bottom: 15px;
+}
+
+.factura-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+  border-color: var(--primario-claro);
+}

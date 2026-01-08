@@ -1,0 +1,10 @@
+export { default as Login } from './LoginContainer';
+export { default as ResetPassword } from './ResetPasswordContainer';
+export { default as Dashboard } from './Dashboard';
+export { default as Pacientes } from './PacientesContainer';
+export { default as Citas } from './CitasContainer';
+export { default as Medicos } from './MedicosContainer';
+export { default as Especialidades } from './EspecialidadesContainer';
+export { default as Facturacion } from './FacturacionContainer';
+export { default as Reportes } from './ReportesContainer';
+export { default as Historial } from './HistorialContainer';

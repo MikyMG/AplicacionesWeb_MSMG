@@ -1,0 +1,126 @@
+/* Variables CSS globales */
+:root {
+  --primario: #c10e1a;
+  --primario-oscuro: #9e0f18;
+  --primario-claro: #e63946;
+  --gris: #666666;
+  --gris-claro: #e0e0e0;
+  --gris-oscuro: #333333;
+  --gris-muy-claro: #f5f5f5;
+  --blanco: #ffffff;
+  --fondo: #f9f9f9;
+  --sombra-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --sombra-md: 0 4px 16px rgba(0,0,0,0.12);
+  --sombra-lg: 0 8px 30px rgba(0,0,0,0.15);
+  --transicion: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radio-borde: 12px;
+}
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--gris-oscuro);
+  background: linear-gradient(135deg, #f9f9f9 0%, #efefef 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gris-muy-claro);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--primario) 0%, var(--primario-oscuro) 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primario-claro) 0%, var(--primario) 100%);
+}
+
+/* Formularios */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease;
+}
+
+/* Mensajes de validación */
+.mensaje-validacion {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 9999;
+  min-width: 320px;
+  max-width: 720px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  opacity: 0;
+  transition: transform 220ms ease, opacity 220ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sombra-lg);
+}
+
+.mensaje-validacion.mostrar {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mensaje-validacion.error {
+  background: linear-gradient(90deg, #ff5f6d 0%, #ff2d55 100%);
+  color: white;
+}
+
+.mensaje-validacion.exito {
+  background: linear-gradient(90deg, #06a77d 0%, #03b57a 100%);
+  color: white;
+}
+
+.mensaje-validacion.info {
+  background: linear-gradient(90deg, #4cc9f0 0%, #2aa7e0 100%);
+  color: white;
+}
+
+.mensaje-texto {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  text-align: center;
+}

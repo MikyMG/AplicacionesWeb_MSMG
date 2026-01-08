@@ -1,0 +1,64 @@
+.resultado-card {
+  background: white;
+  border: 1px solid var(--gris-claro);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-sm);
+}
+
+.resultado-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+  border-color: var(--primario-claro);
+}
+
+.resultado-tipo {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.resultado-tipo.paciente {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.resultado-tipo.cita {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.resultado-tipo.medico {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.resultado-tipo.factura {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+/* Modal para edición rápida desde reportes */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal {
+  background: #ffffff;
+  padding: 18px;
+  width: 760px;
+  max-width: 96%;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+}
