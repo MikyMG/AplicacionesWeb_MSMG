@@ -3,7 +3,7 @@ import EspecialidadesView from '../presentational/EspecialidadesView';
 import { validarNombre } from '../../services/validators';
 
 function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
-  const [formData, setFormData] = useState({ especialidad: '', descripcion: '', responsable: '' });
+  const [formData, setFormData] = useState({ especialidad: '', especialidadOtra: '', descripcion: '', responsable: '' });
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
   const [errores, setErrores] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -17,7 +17,10 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.especialidad || !formData.descripcion) {
+
+    // Si seleccionó 'Otra', tomar el valor especificado en 'especialidadOtra'
+    const especialidadVal = formData.especialidad === 'Otra' && formData.especialidadOtra ? formData.especialidadOtra : formData.especialidad;
+    if (!especialidadVal || !formData.descripcion) {
       mostrarErrores(['Complete los campos obligatorios']); mostrarMensaje('Complete los campos obligatorios', 'error'); return;
     }
 
@@ -26,22 +29,24 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
     if (String(formData.descripcion).length > 2000) { mostrarErrores(['Descripción demasiado larga']); mostrarMensaje('Descripción demasiado larga', 'error'); return; }
 
     // prevenir duplicados (excluyendo el registro en edición)
-    const existe = baseDatos.especialidades.some(ex => ex.especialidad.toLowerCase() === formData.especialidad.toLowerCase() && ex.id !== editingId);
+    const existe = baseDatos.especialidades.some(ex => ex.especialidad.toLowerCase() === especialidadVal.toLowerCase() && ex.id !== editingId);
     if (existe) { mostrarMensaje('Especialidad ya registrada', 'error'); return; }
 
     if (editingId) {
-      const actualizado = baseDatos.especialidades.map(ex => ex.id === editingId ? { ...ex, ...formData } : ex);
+      const finalForm = { ...formData, especialidad: especialidadVal };
+      const actualizado = baseDatos.especialidades.map(ex => ex.id === editingId ? { ...ex, ...finalForm } : ex);
       onActualizar(actualizado);
       mostrarMensaje('Especialidad actualizada', 'exito');
       setEditingId(null);
-      setFormData({ especialidad: '', descripcion: '', responsable: '' });
+      setFormData({ especialidad: '', especialidadOtra: '', descripcion: '', responsable: '' });
       return;
     }
 
-    const nueva = { id: Date.now().toString(), ...formData, fechaRegistro: new Date().toLocaleString() };
+    const finalForm = { ...formData, especialidad: especialidadVal };
+    const nueva = { id: Date.now().toString(), ...finalForm, fechaRegistro: new Date().toLocaleString() };
     onActualizar([...baseDatos.especialidades, nueva]);
     mostrarMensaje('Especialidad registrada', 'exito');
-    setFormData({ especialidad: '', descripcion: '', responsable: '' });
+    setFormData({ especialidad: '', especialidadOtra: '', descripcion: '', responsable: '' });
   };
 
   const eliminar = (id) => {
@@ -57,7 +62,9 @@ function EspecialidadesContainer({ baseDatos, onActualizar, onVolver }) {
   const onEdit = (esp) => {
     if (!esp || !esp.id) return;
     setEditingId(esp.id);
-    setFormData({ especialidad: esp.especialidad || '', descripcion: esp.descripcion || '', responsable: esp.responsable || '' });
+    const known = ['Medicina General','Pediatría','Ginecología','Cardiología','Dermatología','Neurología','Oftalmología','Traumatología'];
+    const isKnown = known.includes(esp.especialidad);
+    setFormData({ especialidad: isKnown ? esp.especialidad : 'Otra', especialidadOtra: isKnown ? '' : (esp.especialidad || ''), descripcion: esp.descripcion || '', responsable: esp.responsable || '' });
   };
 
   // helpers de descarga (JSON / XML / PDF)

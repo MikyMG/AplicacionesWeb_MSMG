@@ -161,3 +161,22 @@
 .imc-text.obesidad2 { color: #f43f5e; }
 .imc-text.obesidad3 { color: #9f1239; }
 
+/* Inputs pequeños para opción 'Otro' junto a selects */
+.select-otro {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.input-otro {
+  padding: 8px 10px;
+  border: 2px solid var(--gris-claro);
+  border-radius: 8px;
+  width: 220px;
+}
+
+@media (max-width: 640px) {
+  .select-otro { flex-direction: column; align-items: stretch; }
+  .input-otro { width: 100%; }
+} 
+

@@ -70,23 +70,33 @@ function PacientesView({ pacientes, formData, onChange, onSubmit, onReset, onDel
           </select>
 
           <label>Nacionalidad</label>
-          <select name="nacionalidad" value={formData.nacionalidad} onChange={(e) => onChange('nacionalidad', e.target.value)}>
-            <option value="">Seleccione...</option>
-            <option value="Ecuatoriana">Ecuatoriana</option>
-            <option value="Otra">Otra</option>
-          </select>
+          <div className="select-otro">
+            <select name="nacionalidad" value={formData.nacionalidad} onChange={(e) => onChange('nacionalidad', e.target.value)}>
+              <option value="">Seleccione...</option>
+              <option value="Ecuatoriana">Ecuatoriana</option>
+              <option value="Otra">Otra</option>
+            </select>
+            {formData.nacionalidad === 'Otra' && (
+              <input type="text" className="input-otro" value={formData.nacionalidadOtra || ''} onChange={(e) => onChange('nacionalidadOtra', e.target.value)} placeholder="Especifique..." />
+            )}
+          </div>
 
           <label>Lugar de Nacimiento</label>
           <input type="text" name="lugarNacimiento" value={formData.lugarNacimiento} onChange={(e) => onChange('lugarNacimiento', e.target.value)} placeholder="Ciudad, País" />
 
           <label>Ocupación</label>
-          <select name="ocupacion" value={formData.ocupacion} onChange={(e) => onChange('ocupacion', e.target.value)}>
-            <option value="">Seleccione...</option>
-            <option value="Estudiante">Estudiante</option>
-            <option value="Empleado">Empleado</option>
-            <option value="Independiente">Independiente</option>
-            <option value="Otro">Otro</option>
-          </select>
+          <div className="select-otro">
+            <select name="ocupacion" value={formData.ocupacion} onChange={(e) => onChange('ocupacion', e.target.value)}>
+              <option value="">Seleccione...</option>
+              <option value="Estudiante">Estudiante</option>
+              <option value="Empleado">Empleado</option>
+              <option value="Independiente">Independiente</option>
+              <option value="Otro">Otro</option>
+            </select>
+            {formData.ocupacion === 'Otro' && (
+              <input type="text" className="input-otro" value={formData.ocupacionOtra || ''} onChange={(e) => onChange('ocupacionOtra', e.target.value)} placeholder="Especifique..." />
+            )}
+          </div>
 
           <h2>Datos de Contacto</h2>
 
@@ -94,22 +104,32 @@ function PacientesView({ pacientes, formData, onChange, onSubmit, onReset, onDel
           <input type="text" name="direccion" value={formData.direccion} onChange={(e) => onChange('direccion', e.target.value)} placeholder="Dirección completa" />
 
           <label>Ciudad</label>
-          <select name="ciudad" value={formData.ciudad} onChange={(e) => onChange('ciudad', e.target.value)}>
-            <option value="">Seleccione...</option>
-            <option value="Portoviejo">Portoviejo</option>
-            <option value="Manta">Manta</option>
-            <option value="Quito">Quito</option>
-            <option value="Otro">Otro</option>
-          </select>
+          <div className="select-otro">
+            <select name="ciudad" value={formData.ciudad} onChange={(e) => onChange('ciudad', e.target.value)}>
+              <option value="">Seleccione...</option>
+              <option value="Portoviejo">Portoviejo</option>
+              <option value="Manta">Manta</option>
+              <option value="Quito">Quito</option>
+              <option value="Otro">Otro</option>
+            </select>
+            {formData.ciudad === 'Otro' && (
+              <input type="text" className="input-otro" value={formData.ciudadOtra || ''} onChange={(e) => onChange('ciudadOtra', e.target.value)} placeholder="Especifique..." />
+            )}
+          </div>
 
           <label>Provincia</label>
-          <select name="provincia" value={formData.provincia} onChange={(e) => onChange('provincia', e.target.value)}>
-            <option value="">Seleccione...</option>
-            <option value="Manabí">Manabí</option>
-            <option value="Pichincha">Pichincha</option>
-            <option value="Guayas">Guayas</option>
-            <option value="Otro">Otra</option>
-          </select>
+          <div className="select-otro">
+            <select name="provincia" value={formData.provincia} onChange={(e) => onChange('provincia', e.target.value)}>
+              <option value="">Seleccione...</option>
+              <option value="Manabí">Manabí</option>
+              <option value="Pichincha">Pichincha</option>
+              <option value="Guayas">Guayas</option>
+              <option value="Otra">Otra</option>
+            </select>
+            {formData.provincia === 'Otra' && (
+              <input type="text" className="input-otro" value={formData.provinciaOtra || ''} onChange={(e) => onChange('provinciaOtra', e.target.value)} placeholder="Especifique..." />
+            )}
+          </div>
 
           <label>Teléfono Celular</label>
           <input type="text" name="telefono" value={formData.telefono} onChange={(e) => onChange('telefono', e.target.value)} placeholder="Ej: 09xxxxxxxx" maxLength={10} inputMode="numeric" pattern="\d{10}" />

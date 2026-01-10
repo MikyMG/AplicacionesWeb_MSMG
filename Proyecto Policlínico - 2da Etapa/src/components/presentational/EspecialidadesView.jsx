@@ -17,17 +17,23 @@ function EspecialidadesView({ especialidades, formData, onChange, onSubmit, onRe
         <div className="boton-retorno"><button onClick={onVolver} className="btn-retorno">← Volver</button></div>
         <form onSubmit={onSubmit}>
           <label>Especialidad</label>
-          <select value={formData.especialidad} onChange={(e) => onChange('especialidad', e.target.value)}>
-            <option value="">Seleccione...</option>
-            <option>Medicina General</option>
-            <option>Pediatría</option>
-            <option>Ginecología</option>
-            <option>Cardiología</option>
-            <option>Dermatología</option>
-            <option>Neurología</option>
-            <option>Oftalmología</option>
-            <option>Traumatología</option>
-          </select>
+          <div className="select-otro">
+            <select value={formData.especialidad} onChange={(e) => onChange('especialidad', e.target.value)}>
+              <option value="">Seleccione...</option>
+              <option>Medicina General</option>
+              <option>Pediatría</option>
+              <option>Ginecología</option>
+              <option>Cardiología</option>
+              <option>Dermatología</option>
+              <option>Neurología</option>
+              <option>Oftalmología</option>
+              <option>Traumatología</option>
+              <option value="Otra">Otra</option>
+            </select>
+            {formData.especialidad === 'Otra' && (
+              <input type="text" className="input-otro" value={formData.especialidadOtra || ''} onChange={(e) => onChange('especialidadOtra', e.target.value)} placeholder="Especifique..." />
+            )}
+          </div>
 
           <label>Descripción</label>
           <input type="text" value={formData.descripcion} onChange={(e) => onChange('descripcion', e.target.value)} />

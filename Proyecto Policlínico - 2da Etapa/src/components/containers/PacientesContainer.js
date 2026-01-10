@@ -6,7 +6,7 @@ import useForm from '../../hooks/useForm';
 function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   const { values: formData, setValues, handleChange, reset } = useForm({
     nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '',
-    tipoSangre: '', nacionalidad: '', lugarNacimiento: '', ocupacion: '', direccion: '', ciudad: '', provincia: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: ''
+    tipoSangre: '', nacionalidad: '', nacionalidadOtra: '', lugarNacimiento: '', ocupacion: '', ocupacionOtra: '', direccion: '', ciudad: '', ciudadOtra: '', provincia: '', provinciaOtra: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: ''
   });
 
   const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
@@ -32,8 +32,16 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // normalizar inputs 'Otro'/'Otra' si se especificaron en el campo adyacente
+    const nacionalidadVal = formData.nacionalidad === 'Otra' && formData.nacionalidadOtra ? formData.nacionalidadOtra : formData.nacionalidad;
+    const ocupacionVal = formData.ocupacion === 'Otro' && formData.ocupacionOtra ? formData.ocupacionOtra : formData.ocupacion;
+    const ciudadVal = formData.ciudad === 'Otro' && formData.ciudadOtra ? formData.ciudadOtra : formData.ciudad;
+    const provinciaVal = formData.provincia === 'Otra' && formData.provinciaOtra ? formData.provinciaOtra : formData.provincia;
+
+    const finalData = { ...formData, nacionalidad: nacionalidadVal, ocupacion: ocupacionVal, ciudad: ciudadVal, provincia: provinciaVal };
+
     // normalizar tipo de sangre a conjunto permitido
-    const tipoSangreValida = BLOOD_TYPES.includes(formData.tipoSangre) ? formData.tipoSangre : '';
+    const tipoSangreValida = BLOOD_TYPES.includes(finalData.tipoSangre ? finalData.tipoSangre : '') ? (finalData.tipoSangre || '') : ''; 
 
     // validaciones estrictas
     if (!validarNombre(formData.nombres)) { mostrarErrores(['Nombre inválido o vacío']); mostrarMensaje('Nombre inválido o vacío', 'error'); return; }
@@ -61,18 +69,18 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
 
     if (editingId) {
       // actualizar paciente existente (asegurar tipo de sangre válido)
-      const actualizado = baseDatos.pacientes.map(p => p.id === editingId ? { ...p, ...formData, tipoSangre: tipoSangreValida } : p);
+      const actualizado = baseDatos.pacientes.map(p => p.id === editingId ? { ...p, ...finalData, tipoSangre: tipoSangreValida } : p);
       onActualizar(actualizado);
       mostrarMensaje('Paciente actualizado', 'exito');
       setEditingId(null);
-      setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', lugarNacimiento: '', ocupacion: '', direccion: '', ciudad: '', provincia: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
+      setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', nacionalidadOtra: '', lugarNacimiento: '', ocupacion: '', ocupacionOtra: '', direccion: '', ciudad: '', ciudadOtra: '', provincia: '', provinciaOtra: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
       return;
     }
 
-    const nuevoPaciente = { id: Date.now().toString(), ...formData, tipoSangre: tipoSangreValida, fechaRegistro: new Date().toLocaleString() };
+    const nuevoPaciente = { id: Date.now().toString(), ...finalData, tipoSangre: tipoSangreValida, fechaRegistro: new Date().toLocaleString() };
     onActualizar([...baseDatos.pacientes, nuevoPaciente]);
     mostrarMensaje('Paciente registrado exitosamente', 'exito');
-    setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', lugarNacimiento: '', ocupacion: '', direccion: '', ciudad: '', provincia: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
+    setValues({ nombres: '', cedula: '', fechaNacimiento: '', edad: '', sexo: '', estadoCivil: '', tipoSangre: '', nacionalidad: '', nacionalidadOtra: '', lugarNacimiento: '', ocupacion: '', ocupacionOtra: '', direccion: '', ciudad: '', ciudadOtra: '', provincia: '', provinciaOtra: '', telefono: '', email: '', peso: '', estatura: '', imc: '', alergias: '', enfermedades: '', tratamientos: '', observaciones: '' });
   };
 
   const eliminarPaciente = (id) => {
@@ -451,6 +459,11 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
     setEditingId(paciente.id);
     // prefills the form with paciente data (normalizar tipo de sangre)
     const tipo = BLOOD_TYPES.includes(paciente.tipoSangre) ? paciente.tipoSangre : '';
+    const nacionalidadKnown = ['Ecuatoriana'].includes(paciente.nacionalidad);
+    const ocupacionKnown = ['Estudiante','Empleado','Independiente'].includes(paciente.ocupacion);
+    const ciudadKnown = ['Portoviejo','Manta','Quito'].includes(paciente.ciudad);
+    const provinciaKnown = ['Manabí','Pichincha','Guayas'].includes(paciente.provincia);
+
     setValues({
       nombres: paciente.nombres || '',
       cedula: paciente.cedula || '',
@@ -459,12 +472,16 @@ function PacientesContainer({ baseDatos, onActualizar, onVolver }) {
       sexo: paciente.sexo || '',
       estadoCivil: paciente.estadoCivil || '',
       tipoSangre: tipo,
-      nacionalidad: paciente.nacionalidad || '',
+      nacionalidad: nacionalidadKnown ? paciente.nacionalidad : (paciente.nacionalidad ? 'Otra' : ''),
+      nacionalidadOtra: nacionalidadKnown ? '' : (paciente.nacionalidad || ''),
       lugarNacimiento: paciente.lugarNacimiento || '',
-      ocupacion: paciente.ocupacion || '',
+      ocupacion: ocupacionKnown ? paciente.ocupacion : (paciente.ocupacion ? 'Otro' : ''),
+      ocupacionOtra: ocupacionKnown ? '' : (paciente.ocupacion || ''),
       direccion: paciente.direccion || '',
-      ciudad: paciente.ciudad || '',
-      provincia: paciente.provincia || '',
+      ciudad: ciudadKnown ? paciente.ciudad : (paciente.ciudad ? 'Otro' : ''),
+      ciudadOtra: ciudadKnown ? '' : (paciente.ciudad || ''),
+      provincia: provinciaKnown ? paciente.provincia : (paciente.provincia ? 'Otra' : ''),
+      provinciaOtra: provinciaKnown ? '' : (paciente.provincia || ''),
       telefono: paciente.telefono || '',
       email: paciente.email || '',
       peso: paciente.peso || '',
