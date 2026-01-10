@@ -12,6 +12,7 @@ function EspecialidadesView({ especialidades, formData, onChange, onSubmit, onRe
           </ul>
         </div>
       )}
+      <div className="header-pagina">Gestión de Especialidades</div>
       <div className="container">
         <div className="boton-retorno"><button onClick={onVolver} className="btn-retorno">← Volver</button></div>
         <form onSubmit={onSubmit}>
